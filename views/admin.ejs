@@ -1,0 +1,402 @@
+<!--Garrett Safsten, Will Knudson, Willard Richards, and Logan Johnson
+This view contains the dashboard of the participants, the ability to search, edit, delete, and add participants.
+The admin can also add personal notes.-->
+<!-- NOTE: Server provides `registrations`, `pendingRegs`, `emailList`, and `user`.
+    The inline scripts use these server-side values rendered by EJS. Comments were
+    added for maintainers; no logic was changed. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin - Sewing Camp</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+
+<!-- STYLE: Admin dashboard styling. Includes navbar, search, optimized table layout, and action buttons. -->
+<style>
+/* Global theme (professional + playful) */
+:root{
+    --accent-1:#0b63ff;
+    --accent-2:#d6336c;
+    --nav-dark-1:#2a3d66;
+    --nav-dark-2:#0b3d8a;
+}
+body{
+    background:linear-gradient(180deg,#fffefa 0%, #f6f9ff 100%);
+    font-family:'Nunito', Arial, sans-serif;
+    margin:0; padding:10px; color:#222; /* Reduced body padding */
+}
+
+/* Primary navigation */
+.navbar{
+    background:linear-gradient(135deg,var(--nav-dark-1) 0%, var(--nav-dark-2) 100%);
+    padding:0; margin:0 auto 20px; border-radius:10px; box-shadow:0 6px 20px rgba(42,61,102,0.12);
+    max-width:98%; /* Match container width */
+    display:flex; align-items:center; justify-content:center; flex-wrap:wrap;
+}
+.navbar-menu{display:flex; list-style:none; margin:0; padding:0; gap:6px}
+.navbar-item a{display:block; padding:14px 14px; color:#fff; text-decoration:none; font-weight:700; font-size:14px; border-bottom:3px solid transparent; transition: background-color 0.3s, border-bottom-color 0.3s;}
+.navbar-item a:hover{background:rgba(255,255,255,0.06); border-bottom-color:#ff8fab}
+.navbar-actions{display:flex; gap:8px; padding:8px 16px;}
+
+.btn-logout{
+    padding:10px 16px; 
+    border-radius:8px; 
+    color:#fff; 
+    font-weight:700; 
+    text-decoration:none; 
+    font-size: 13px; 
+    transition: box-shadow 0.3s, transform 0.2s;
+    background:linear-gradient(135deg,#ef4444,#dc2626);
+}
+
+.btn-logout:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.2); transform: translateY(-2px); }
+
+/* Page container - Expanded to 98% to fit all columns without scrolling */
+.container{
+    max-width: 98%; 
+    margin:10px auto; 
+    background:#fff; 
+    padding:15px; 
+    border-radius:10px; 
+    box-shadow:0 10px 30px rgba(11,63,136,0.06)
+}
+
+.header-row{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:18px}
+.btn-add{background:var(--accent-1); color:#fff; padding:10px 18px; border-radius:8px; text-decoration:none; font-weight:800; white-space: nowrap;}
+.btn-email{background:#7c3aed; color:#fff; padding:10px 18px; border-radius:8px; text-decoration:none; font-weight:800; white-space: nowrap;}
+
+/* Search Bar Styles */
+.search-container { margin-bottom: 20px; display: flex; gap: 10px; }
+.search-input { 
+    flex-grow: 1; 
+    padding: 10px 15px; 
+    border: 1px solid #ccc; 
+    border-radius: 6px; 
+    font-size: 14px;
+    font-family: inherit;
+    transition: border-color 0.2s;
+}
+.search-input:focus { outline: none; border-color: var(--accent-1); box-shadow: 0 0 0 3px rgba(11,99,255,0.1); }
+.btn-search { background: var(--nav-dark-1); color: #fff; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+.btn-clear { background: #e5e7eb; color: #4b5563; border: none; padding: 10px 15px; border-radius: 6px; font-weight: bold; text-decoration: none; }
+
+/* --- OPTIMIZED TABLE STYLES --- */
+.admin-table{
+    width:100%; 
+    border-collapse:collapse; 
+    font-size:13px; /* Slightly smaller text to fit more */
+    margin-bottom: 30px;
+    table-layout: auto; /* Allow auto sizing based on content */
+}
+
+.admin-table th, .admin-table td {
+    padding: 8px 6px; /* Tight padding */
+    border-bottom:1px solid #f1f5f9; 
+    text-align:left; 
+    vertical-align:top;
+}
+
+.admin-table th{background:#fbfbfe; color:var(--nav-dark-1); font-weight:800}
+
+/* Buttons */
+.action-btn{padding:4px 8px; border-radius:4px; color:#fff; text-decoration:none; font-size:11px; border:none; cursor:pointer;}
+.btn-edit{background:#f59e0b}
+.btn-delete{background:#ef4444}
+.btn-approve { background: #10b981; }
+.btn-reject { background: #ef4444; }
+
+h2{color:var(--accent-2); font-family:'Fredoka', sans-serif; margin:0}
+h3.section-title { color: #2a3d66; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 30px; }
+
+/* Season Badge */
+.season-badge { padding: 3px 6px; border-radius: 8px; font-size: 10px; font-weight: bold; color: white; display: inline-block; margin-bottom: 2px; }
+.season-Valentine { background-color: #ec4899; }
+.season-Easter { background-color: #a855f7; }
+.season-Summer { background-color: #10b981; }
+.season-Halloween { background-color: #f97316; }
+.season-Christmas { background-color: #ef4444; }
+
+/* Status Badge */
+.status-rejected { color: #ef4444; font-weight: bold; font-size: 0.9em; }
+.status-approved { color: #10b981; font-weight: bold; font-size: 0.9em; }
+
+/* --- COLUMN WIDTH OPTIMIZATIONS --- */
+
+/* 1. Email Column: Constrained and Wrapping */
+.col-email {
+    max-width: 110px;
+    word-break: break-all; /* Forces wrap on long emails */
+    font-size: 0.9em;
+}
+
+/* 2. Address & Requests: Constrained width */
+.col-address, .col-requests {
+    max-width: 140px;
+    word-wrap: break-word;
+}
+
+/* 3. Small Columns */
+.col-age, .col-waiver {
+    width: 30px;
+    text-align: center;
+}
+.col-phone {
+    white-space: nowrap; /* Don't wrap phone numbers */
+}
+
+/* 4. Notes Column: Expanded */
+.notes-cell { 
+    width: 280px; /* Wider fixed width */
+    min-width: 250px;
+}
+.notes-input { 
+    width: 100%; 
+    border: 1px solid #e5e7eb; 
+    border-radius: 6px; 
+    padding: 8px; 
+    font-family: inherit; 
+    font-size: 13px; 
+    resize: vertical; 
+    min-height: 100px; /* Taller by default */
+    box-sizing: border-box; 
+    line-height: 1.4;
+}
+.notes-input:focus { outline: none; border-color: var(--accent-1); box-shadow: 0 0 0 2px rgba(11,99,255,0.1); }
+.char-counter { font-size: 10px; color: #9ca3af; text-align: right; margin-top: 2px; }
+
+@media (max-width:768px){
+    .navbar{flex-direction:column}
+    .navbar-actions{width:100%; justify-content:center}
+    .header-row{flex-direction:column; align-items:flex-start}
+}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+    <ul class="navbar-menu">
+        <li class="navbar-item"><a href="/">Home</a></li>
+        <li class="navbar-item"><a href="/campinfo">Camp Info</a></li>
+        <li class="navbar-item"><a href="/campschedule">Schedule</a></li>
+        <li class="navbar-item"><a href="/registrations">Registration</a></li>
+        <li class="navbar-item"><a href="/contactus">Contact</a></li>
+    </ul>
+    <div class="navbar-actions">
+        <a href="/logout" class="btn-logout">Logout</a>
+    </div>
+</nav>
+
+<div class="container">
+    <!-- HEADER: Dashboard actions and quick utilities (Add, Email, Quick Stats) -->
+    <div class="header-row">
+        <div>
+            <h2>Admin Dashboard</h2>
+            <p style="margin:5px 0 0;">Welcome, <%= user ? user.username : 'Guest' %></p>
+        </div>
+        <div>
+            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=garrett.safsten@gmail.com&bcc=<%= emailList %>" target="_blank" class="btn-email">📧 Mass Email</a>
+            <a href="/admin/add" class="btn-add">+ Add New Record</a>
+        </div>
+    </div>
+
+    <% if (pendingRegs && pendingRegs.length > 0) { %>
+        <h3 class="section-title" style="color: #d97706;">⚠️ Pending Approvals (<%= pendingRegs.length %>)</h3>
+        <div style="overflow-x: auto; background: #fffbf0; border: 1px solid #fde68a; border-radius: 8px; margin-bottom: 20px;">
+            <!-- PENDING TABLE: Quick action table for pending registrations awaiting approval -->
+            <table class="admin-table" style="margin-bottom: 0;">
+                <thead>
+                    <tr>
+                        <th width="100">Decision</th>
+                        <th>Child Name</th>
+                        <th>Session</th>
+                        <th>Parent</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% pendingRegs.forEach(reg => { %>
+                        <tr>
+                            <td style="white-space: nowrap;">
+                                <form action="/admin/approve/<%= reg.reg_id %>" method="POST" style="display:inline;" onsubmit="return confirm('Accept this student into the class?');">
+                                    <button type="submit" class="action-btn btn-approve">Accept</button>
+                                </form>
+                                <form action="/admin/reject/<%= reg.reg_id %>" method="POST" style="display:inline;" onsubmit="return confirm('Reject this student? This will free up the seat.');">
+                                    <button type="submit" class="action-btn btn-reject">Reject</button>
+                                </form>
+                            </td>
+                            <td><%= reg.first_name %> <%= reg.last_name %></td>
+                            <td>
+                                <% if(reg.Sessionname) { %>
+                                    <strong><%= reg.Sessionname %></strong>
+                                    <br><span style="font-size:0.85em"><%= new Date(reg.session_start).toLocaleDateString() %></span>
+                                <% } %>
+                            </td>
+                            <td><%= reg.parentfirstname %> (<%= reg.phone %>)</td>
+                            <td><%= reg.special_requests %></td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+    <% } %>
+
+    <h3 class="section-title">Registration History</h3>
+    <form action="/admin" method="GET" class="search-container">
+        <input type="text" name="search" class="search-input" placeholder="Search multiple (e.g. John, Summer, 2025)..." value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>">
+        <button type="submit" class="btn-search">Search</button>
+        <% if (typeof searchQuery !== 'undefined' && searchQuery) { %>
+            <a href="/admin" class="btn-clear">Clear</a>
+        <% } %>
+    </form>
+
+    <% if (typeof registrations !== 'undefined' && registrations.length > 0) { %>
+        <div style="overflow-x: auto;">
+            <!-- MAIN TABLE: Full registrations list with search and action buttons -->
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th width="80">Actions</th>
+                        <th width="70">Status</th>
+                        <th>Child Name</th>
+                        <th class="col-age">Age</th>
+                        <th>Birthdate</th>
+                        <th>Parent Name</th>
+                        <th class="col-phone">Phone</th>
+                        <th class="col-email">Email</th>
+                        <th class="col-address">Address</th>
+                        <th class="col-requests">Requests</th>
+                        <th class="col-waiver">Waiver</th>
+                        <th>Registered</th>
+                        <th width="160">Session Details</th>
+                        <th>Personal Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% registrations.forEach(reg => { %>
+                        <%
+                            const formatT = (t) => {
+                                if (!t) return '';
+                                let [hours, minutes] = t.split(':');
+                                hours = parseInt(hours);
+                                const ampm = hours >= 12 ? 'PM' : 'AM';
+                                hours = hours % 12;
+                                hours = hours ? hours : 12; 
+                                return `${hours}:${minutes}${ampm}`;
+                            };
+                        %>
+                        <tr>
+                            <td style="white-space: nowrap;">
+                                <a href="/admin/edit/<%= reg.reg_id %>" class="action-btn btn-edit">Edit</a>
+                                <form action="/admin/delete/<%= reg.reg_id %>" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this record?');">
+                                    <button type="submit" class="action-btn btn-delete">Del</button>
+                                </form>
+                            </td>
+                            <td>
+                                <% if(reg.status === 'rejected') { %>
+                                    <span class="status-rejected">Rejected</span>
+                                <% } else { %>
+                                    <span class="status-approved">Approved</span>
+                                <% } %>
+                            </td>
+                            <td><%= reg.first_name %> <%= reg.last_name %></td>
+                            <td class="col-age"><%= reg.childage %></td>
+                            <td><%= reg.birthdate ? new Date(reg.birthdate).toLocaleDateString() : '-' %></td>
+                            <td><%= reg.parentfirstname %><br><%= reg.parentlastname %></td>
+                            <td class="col-phone"><%= reg.phone %></td>
+                            
+                            <td class="col-email">
+                                <a href="https://mail.google.com/mail/?view=cm&fs=1&to=<%= reg.email %>" target="_blank" style="color: #0b63ff; text-decoration: none; font-weight: 600;">
+                                    <%= reg.email %>
+                                </a>
+                            </td>
+
+                            <td class="col-address"><%= reg.streetaddress %><br><%= reg.city %>, <%= reg.state %> <%= reg.zipcode %></td>
+                            <td class="col-requests"><%= reg.special_requests || 'None' %></td>
+                            <td class="col-waiver"><%= reg.waiver %></td>
+                            <td><%= new Date(reg.created_at).toLocaleDateString() %></td>
+                            <td style="min-width: 150px;">
+                                <% const seas = reg.season || 'Summer'; %>
+                                <span class="season-badge season-<%= seas %>"><%= seas %></span><br>
+                                
+                                <% if(reg.Sessionname) { %>
+                                    <strong><%= reg.Sessionname %></strong><br>
+                                    <span style="font-size:0.85em; color:#555;">
+                                        <%= new Date(reg.session_start).toLocaleDateString(undefined, {month:'short', day:'numeric'}) %> - 
+                                        <%= new Date(reg.session_end).toLocaleDateString(undefined, {month:'short', day:'numeric', year:'numeric'}) %>
+                                        <br>
+                                        <%= formatT(reg.session_stime) %> - <%= formatT(reg.session_etime) %>
+                                    </span>
+                                <% } else { %>
+                                    <span style="color:#999; font-style:italic;">Not Selected</span>
+                                <% } %>
+                            </td>
+                            
+                            <td class="notes-cell">
+                                <textarea 
+                                    class="notes-input" 
+                                    data-id="<%= reg.reg_id %>" 
+                                    maxlength="300"
+                                    placeholder="Enter personal notes..."><%= reg.notes || '' %></textarea>
+                                <div class="char-counter" id="counter-<%= reg.reg_id %>">
+                                    <%= (reg.notes || '').length %>/300
+                                </div>
+                            </td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+    <% } else { %>
+        <p>No registrations found matching your search.</p>
+    <% } %>
+</div>
+
+<!-- SCRIPT: Admin dashboard JS — inline notes autosave and UI helpers -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    /* ADMIN SCRIPT: Provides inline note autosave (POST /admin/update-note),
+       character counters for notes fields, and visual feedback on save.
+       Runs after DOMContentLoaded to attach handlers to existing note inputs. */
+    const textareas = document.querySelectorAll('.notes-input');
+
+    textareas.forEach(area => {
+        const id = area.dataset.id;
+        const counter = document.getElementById('counter-' + id);
+
+        // Update counter on input
+        area.addEventListener('input', function() {
+            counter.textContent = `${this.value.length}/300`;
+        });
+
+        // Save on blur (when user clicks away)
+        area.addEventListener('blur', function() {
+            const regId = this.dataset.id;
+            const content = this.value;
+
+            fetch('/admin/update-note', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ reg_id: regId, notes: content })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.success) {
+                    // Visual feedback (brief flash of green border)
+                    this.style.borderColor = '#10b981';
+                    setTimeout(() => { this.style.borderColor = '#e5e7eb'; }, 1000);
+                } else {
+                    this.style.borderColor = '#ef4444';
+                    alert('Error saving note.');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                this.style.borderColor = '#ef4444';
+            });
+        });
+    });
+});
+</script>
+
+</body>
+</html>

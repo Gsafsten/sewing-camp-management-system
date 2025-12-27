@@ -1,0 +1,537 @@
+<!--Garrett Safsten, Will Knudson, Willard Richards, and Logan Johnson
+This view contains the registration form for new participants.-->
+<!-- NOTE: Server injects `sessions` as JSON for populating the session dropdown.
+    Client script below uses `sessions` to filter by season, calculate availability,
+    and display session details. These are normal EJS injections and should not be modified. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Register - Sewing Camp</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* PAGE BACKGROUND AND LAYOUT */
+body { background: linear-gradient(180deg,#fffefa 0%, #f6f9ff 100%); font-family: 'Nunito', Arial, sans-serif; margin: 0; padding: 20px; color: #222; }
+
+/* NAVIGATION BAR STYLES */
+.navbar { 
+    background: linear-gradient(135deg, #2a3d66 0%, #0b3d8a 100%); 
+    padding: 0; 
+    margin: 0 auto 20px; 
+    border-radius: 10px; 
+    max-width: 900px; 
+    display: flex; 
+    align-items: center; /* Ensures vertical alignment */
+    justify-content: center; /* Centers everything horizontally */
+    flex-wrap: wrap; 
+    box-shadow: 0 6px 20px rgba(42, 61, 102, 0.2); 
+}
+
+/* NAVBAR MENU ITEMS */
+.navbar-menu { 
+    display: flex; 
+    list-style: none; 
+    margin: 0; 
+    padding: 0; 
+    flex-wrap: wrap; 
+}
+
+/* NAVBAR LINKS */
+.navbar-item a { 
+    display: block; 
+    padding: 18px 16px; 
+    color: #fff; 
+    text-decoration: none; 
+    font-weight: 600; 
+    font-size: 14px; 
+    transition: background-color 0.3s; 
+    border-bottom: 3px solid transparent; 
+}
+
+/* NAVBAR LINK HOVER STATE */
+.navbar-item a:hover { 
+    background-color: rgba(255, 255, 255, 0.15); 
+    border-bottom-color: #ff8fab; 
+}
+
+/* NAVBAR ACTION BUTTONS (LOGIN/LOGOUT/ADMIN) */
+.navbar-actions { 
+    display: flex; 
+    gap: 8px; 
+    padding: 8px 15px; 
+}
+
+/* LOGIN AND ADMIN BUTTONS */
+.btn-login, .btn-logout, .btn-admin { 
+    padding: 8px 15px; 
+    border-radius: 6px; 
+    text-decoration: none; 
+    color: white; 
+    font-size: 13px; 
+    font-weight: bold; 
+    border: none; 
+    cursor: pointer; 
+}
+.btn-login { background: #d6336c; } 
+.btn-admin { background: #0b63ff; } 
+.btn-logout { background: #ef4444; }
+
+/* FORM CONTAINER */
+.container { max-width: 700px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+
+/* FORM HEADINGS */
+h2 { color: #d6336c; font-family: 'Fredoka', sans-serif; margin-top: 0; }
+.style14 { font-family: Arial, Helvetica, sans-serif; color: #475569; margin-bottom: 20px; }
+
+/* FORM GROUP SPACING AND STYLING */
+.form-group { margin-bottom: 15px; }
+label { display: block; margin-bottom: 5px; font-weight: bold; color: #2a3d66; }
+input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-family: inherit; transition: border-color 0.2s; }
+input:focus, select:focus, textarea:focus { outline: none; border-color: #7aa2ff; box-shadow: 0 0 0 3px rgba(122,162,255,0.1); }
+
+/* CHECKBOX STYLING */
+input[type="checkbox"] {
+    width: auto;
+    display: inline-block;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+/* TWO-COLUMN LAYOUT FOR FORM ROWS */
+.row { display: flex; gap: 15px; }
+.col { flex: 1; }
+
+/* RESPONSIVE DESIGN - STACK COLUMNS ON MOBILE */
+@media (max-width: 600px) { .row { flex-direction: column; gap: 0; } }
+
+/* SUBMIT BUTTON */
+.btn-submit { background: linear-gradient(135deg, #ff8fab, #d6336c); color: #fff; padding: 12px 24px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; box-shadow: 0 6px 14px rgba(214,51,108,0.24); transition: transform 0.2s; }
+.btn-submit:hover { transform: translateY(-2px); }
+
+/* MODAL OVERLAY AND STYLING */
+.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.45); display: none; align-items: center; justify-content: center; z-index: 1000; }
+.modal { background: #fff; max-width: 640px; width: 92%; padding: 18px; border-radius: 10px; box-shadow: 0 10px 40px rgba(11, 63, 136, 0.24); } 
+.modal-header { font-weight: 700; margin-bottom: 8px; color:#0b63ff; font-size: 1.2em; }
+.modal-close { float: right; cursor: pointer; font-size: 20px; padding: 6px; background: none; border: none; color: #666; }
+.modal-body p, .modal-body li { color:#333; line-height:1.45; }
+.modal-body ul { padding-left: 20px; }
+</style>
+</head>
+<body>
+    <!-- BANNER: Top banner image used across public pages -->
+<div style="max-width: 700px; margin: 0 auto 20px; text-align: center;">
+    <img src="/images/SewingMadeSimpleForKidsBanner.png" alt="Banner" style="max-width: 100%; height: auto;">
+</div>
+
+<nav class="navbar">
+    <!-- NAVIGATION: Main site navigation (Home / Camp Info / Schedule / Registration / Contact) -->
+    <ul class="navbar-menu">
+        <li class="navbar-item"><a href="/">Home</a></li>
+        <li class="navbar-item"><a href="/campinfo">Camp Info</a></li>
+        <li class="navbar-item"><a href="/campschedule">Schedule</a></li>
+        <li class="navbar-item"><a href="/registrations">Registration</a></li>
+        <li class="navbar-item"><a href="/contactus">Contact</a></li>
+    </ul>
+    <div class="navbar-actions">
+        <% if (user) { %>
+            <a href="/admin" class="btn-admin">Admin</a>
+            <a href="/logout" class="btn-logout">Logout</a>
+        <% } else { %>
+            <a href="/login" class="btn-login">Login</a>
+        <% } %>
+    </div>
+</nav>
+
+<div class="container">
+    <h2>Registration Form</h2>
+    <p class="style14">Please fill out the information below to register for Sewing Camp. Required fields are marked with *</p>
+
+    <% if (error_message) { %> <div style="color: red; margin-bottom: 15px; padding: 10px; background: #fff1f2; border-radius: 6px;"><%= error_message %></div> <% } %>
+    <% if (success_message) { %> <div style="color: green; margin-bottom: 15px; padding: 10px; background: #ecfdf5; border-radius: 6px;"><%= success_message %></div> <% } %>
+
+    <form action="/register" method="POST">
+        <!-- FORM: Public registration collects season/session, child info, parent info, address, and waiver -->
+        <!-- SEASON AND SESSION SELECTION -->
+        <div class="row">
+            <div class="col form-group">
+                <label>Holiday/Season*</label>
+                <select id="seasonSelect" name="season" required>
+                    <option value="">Select Season</option>
+                    <option value="Valentine">Valentine</option>
+                    <option value="Easter">Easter</option>
+                    <option value="Summer">Summer</option>
+                    <option value="Halloween">Halloween</option>
+                    <option value="Christmas">Christmas</option>
+                </select>
+            </div>
+            <div class="col form-group">
+                <label>Session*</label>
+                <select id="sessionSelect" name="selected_session" required disabled>
+                    <option value="">Select a Season first</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- CHILD/PARTICIPANT INFORMATION -->
+        <div class="row">
+            <div class="col form-group">
+                <label>Child First Name*</label>
+                <input type="text" name="first_name" required>
+            </div>
+            <div class="col form-group">
+                <label>Child Last Name*</label>
+                <input type="text" name="last_name" required>
+            </div>
+        </div>
+
+        <!-- BIRTHDATE AND AGE -->
+        <div class="row">
+            <div class="col form-group">
+                <label>Child Birthdate*</label>
+                <input type="date" name="birthdate" required>
+            </div>
+            <div class="col form-group">
+                <label>Age</label>
+                <input type="number" name="age" readonly style="background:#f4f4f4; color: #666;" required>
+            </div>
+        </div>
+
+        <!-- PARENT/GUARDIAN INFORMATION -->
+        <div class="row">
+            <div class="col form-group">
+                <label>Parent First Name*</label>
+                <input type="text" name="parent_first_name" required>
+            </div>
+            <div class="col form-group">
+                <label>Parent Last Name*</label>
+                <input type="text" name="parent_last_name" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Parent Email*</label>
+            <input type="email" name="email" required>
+        </div>
+
+        <div class="form-group">
+            <label>Parent Phone*</label>
+            <input type="tel" name="phone" placeholder="123-456-7890" required>
+        </div>
+
+        <!-- ADDRESS INFORMATION -->
+        <div class="form-group">
+            <label>Street Address*</label>
+            <input type="text" name="street_address" required>
+        </div>
+
+        <div class="row">
+            <div class="col form-group">
+                <label>City*</label>
+                <input type="text" name="city" required>
+            </div>
+            <div class="col form-group">
+                <label>State*</label>
+                <select name="state" required>
+                    <option value="MD" selected>Maryland</option>
+                    <option value="VA">Virginia</option>
+                    <option value="PA">Pennsylvania</option>
+                    <option value="AL">Alabama</option>
+                    <option value="AK">Alaska</option>
+                    <option value="AZ">Arizona</option>
+                    <option value="AR">Arkansas</option>
+                    <option value="CA">California</option>
+                    <option value="CO">Colorado</option>
+                    <option value="CT">Connecticut</option>
+                    <option value="DE">Delaware</option>
+                    <option value="FL">Florida</option>
+                    <option value="GA">Georgia</option>
+                    <option value="HI">Hawaii</option>
+                    <option value="ID">Idaho</option>
+                    <option value="IL">Illinois</option>
+                    <option value="IN">Indiana</option>
+                    <option value="IA">Iowa</option>
+                    <option value="KS">Kansas</option>
+                    <option value="KY">Kentucky</option>
+                    <option value="LA">Louisiana</option>
+                    <option value="ME">Maine</option>
+                    <option value="MA">Massachusetts</option>
+                    <option value="MI">Michigan</option>
+                    <option value="MN">Minnesota</option>
+                    <option value="MS">Mississippi</option>
+                    <option value="MO">Missouri</option>
+                    <option value="MT">Montana</option>
+                    <option value="NE">Nebraska</option>
+                    <option value="NV">Nevada</option>
+                    <option value="NH">New Hampshire</option>
+                    <option value="NJ">New Jersey</option>
+                    <option value="NM">New Mexico</option>
+                    <option value="NY">New York</option>
+                    <option value="NC">North Carolina</option>
+                    <option value="ND">North Dakota</option>
+                    <option value="OH">Ohio</option>
+                    <option value="OK">Oklahoma</option>
+                    <option value="OR">Oregon</option>
+                    <option value="RI">Rhode Island</option>
+                    <option value="SC">South Carolina</option>
+                    <option value="SD">South Dakota</option>
+                    <option value="TN">Tennessee</option>
+                    <option value="TX">Texas</option>
+                    <option value="UT">Utah</option>
+                    <option value="VT">Vermont</option>
+                    <option value="WA">Washington</option>
+                    <option value="WV">West Virginia</option>
+                    <option value="WI">Wisconsin</option>
+                    <option value="WY">Wyoming</option>
+                </select>
+            </div>
+            <div class="col form-group">
+                <label>Zip Code*</label>
+                <input type="text" name="zipcode" required>
+            </div>
+        </div>
+
+        <!-- ADDITIONAL REQUESTS / NOTES -->
+        <div class="form-group">
+            <label>List of Projects and Requests</label> 
+            <textarea name="special_requests" rows="3"></textarea> 
+        </div>
+
+        <!-- WAIVER AGREEMENT -->
+        <div class="form-group">
+            <input type="checkbox" id="agree" name="agree" required>
+            <label for="agree" style="display:inline; font-weight:normal;">I agree to the <a href="#" id="termsLink">Terms and Conditions</a></label>
+        </div>
+
+        <button type="submit" class="btn-submit">Register Now</button>
+    </form>
+    
+    <p class="style14" style="text-align:center; margin-top:20px;">After submitting, you will receive a confirmation email with camp details.</p>
+</div>
+
+<!-- SCRIPT: Client-side form behavior: populate sessions dropdown, calculate age, format phone, validation, and modal display -->
+<script>
+(function () {
+    /* FORM SCRIPT: Handles dynamic session dropdown population, age calculation from DOB,
+       phone input formatting, date/time helpers, client-side validation, and modal display logic.
+       The `sessions` array is injected server-side as JSON and used to populate session options. */
+    // 0. Session Data from Server
+    const sessions = <%- JSON.stringify(sessions || []) %>;
+
+    // 1. Age Calculation Logic
+    function calculateAgeFromDOB(dobString) {
+        if (!dobString) return '';
+        const today = new Date();
+        const dob = new Date(dobString);
+        if (isNaN(dob)) return '';
+        let age = today.getFullYear() - dob.getFullYear();
+        const m = today.getMonth() - dob.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+            age--;
+        }
+        return age >= 0 ? age : '';
+    }
+
+    // 2. Phone Formatting Logic
+    function formatPhoneDigits(digits) {
+        if (digits.length < 4) return digits;
+        if (digits.length < 7) return digits.slice(0,3) + '-' + digits.slice(3);
+        return digits.slice(0,3) + '-' + digits.slice(3,6) + '-' + digits.slice(6,10);
+    }
+
+    // 3. Helper for Date/Time Formatting
+    function formatDateStr(d) {
+        const date = new Date(d);
+        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const mon = months[date.getMonth()];
+        const dd = String(date.getDate()).padStart(2, '0');
+        const yyyy = date.getFullYear();
+        return `${mon}-${dd}-${yyyy}`;
+    }
+
+    function formatTimeStr(t) {
+        if (!t) return '';
+        let [hours, minutes] = t.split(':');
+        hours = parseInt(hours);
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12; 
+        return `${hours}:${minutes}${ampm}`;
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.querySelector('form[action="/register"]') || document.querySelector('form');
+        const birthInput = form.querySelector('input[name="birthdate"]');
+        const ageInput = form.querySelector('input[name="age"]');
+        const phoneInput = form.querySelector('input[name="phone"]');
+        const agreeLink = document.getElementById('termsLink');
+        const modalOverlay = document.getElementById('termsModalOverlay');
+        const modalCloses = modalOverlay ? modalOverlay.querySelectorAll('.modal-close') : [];
+
+        // --- NEW: Dropdown Logic ---
+        const seasonSelect = document.getElementById('seasonSelect');
+        const sessionSelect = document.getElementById('sessionSelect');
+
+        if (seasonSelect && sessionSelect) {
+            seasonSelect.addEventListener('change', function() {
+                const season = this.value;
+                
+                // Clear existing options
+                sessionSelect.innerHTML = '';
+
+                if (season) {
+                    // Enable and Populate
+                    sessionSelect.disabled = false;
+                    
+                    // Add default prompt
+                    const defaultOpt = document.createElement('option');
+                    defaultOpt.value = "";
+                    defaultOpt.textContent = "Select a Session";
+                    sessionSelect.appendChild(defaultOpt);
+
+                    // Filter sessions by season
+                    const filteredSessions = sessions.filter(s => (s.season || 'Summer') === season);
+
+                    if (filteredSessions.length > 0) {
+                        filteredSessions.forEach(s => {
+                            const opt = document.createElement('option');
+                            opt.value = s.Sessionid; 
+                            
+                            // Check for capacity
+                            const enrolled = parseInt(s.enrolled_count || 0);
+                            const max = parseInt(s.numseats || 0);
+                            const isFull = enrolled >= max;
+
+                            const dateRange = `${formatDateStr(s.startdate)} to ${formatDateStr(s.enddate)}`;
+                            const timeRange = `${formatTimeStr(s.starttime)} - ${formatTimeStr(s.endtime)}`;
+                            
+                            let text = `${s.Sessionname}: ${dateRange} (${timeRange})`;
+                            
+                            if (isFull) {
+                                text += " - FULL";
+                                opt.disabled = true;
+                                opt.style.color = "#aaa";
+                            } else {
+                                text += ` (${enrolled}/${max} filled)`;
+                            }
+
+                            opt.textContent = text;
+                            sessionSelect.appendChild(opt);
+                        });
+                    } else {
+                        const opt = document.createElement('option');
+                        opt.textContent = "No sessions available for this season";
+                        sessionSelect.appendChild(opt);
+                    }
+                } else {
+                    // Reset if no season selected
+                    sessionSelect.disabled = true;
+                    const opt = document.createElement('option');
+                    opt.textContent = "Select a Season first";
+                    sessionSelect.appendChild(opt);
+                }
+            });
+        }
+
+        // Set Max Date to Today
+        const todayStr = new Date().toISOString().split('T')[0];
+        if(birthInput) birthInput.setAttribute('max', todayStr);
+
+        // Update Age on Change
+        function updateAge() {
+            const age = calculateAgeFromDOB(birthInput.value);
+            ageInput.value = age === '' ? '' : age;
+        }
+        if(birthInput) {
+            birthInput.addEventListener('input', updateAge);
+            birthInput.addEventListener('change', updateAge);
+        }
+
+        // Phone Formatting Events
+        if(phoneInput) {
+            phoneInput.addEventListener('input', function (e) {
+                const digits = (e.target.value || '').replace(/\D/g, '').slice(0,10);
+                e.target.value = formatPhoneDigits(digits);
+            });
+            phoneInput.addEventListener('blur', function (e) {
+                const digits = (e.target.value || '').replace(/\D/g, '');
+                if (digits.length === 10) {
+                    e.target.value = formatPhoneDigits(digits);
+                }
+            });
+        }
+
+        // Modal Logic
+        if (agreeLink && modalOverlay) {
+            agreeLink.addEventListener('click', function (ev) {
+                ev.preventDefault();
+                modalOverlay.style.display = 'flex';
+            });
+            modalOverlay.addEventListener('click', function (ev) {
+                if (ev.target === modalOverlay) modalOverlay.style.display = 'none';
+            });
+            modalCloses.forEach(function(el){ 
+                el.addEventListener('click', function(){ modalOverlay.style.display = 'none'; }); 
+            });
+        }
+
+        // Form Validation on Submit
+        form.addEventListener('submit', function (e) {
+            updateAge();
+            // Validate Phone
+            const digits = (phoneInput.value || '').replace(/\D/g, '');
+            if (digits.length !== 10) {
+                e.preventDefault();
+                alert('Please enter a valid 10-digit phone number.');
+                phoneInput.focus();
+                return false;
+            }
+            phoneInput.value = formatPhoneDigits(digits);
+            
+            // Validate Age
+            if (!birthInput.value) {
+                e.preventDefault();
+                alert('Please enter a valid birthdate.');
+                birthInput.focus();
+                return false;
+            }
+        });
+    });
+})();
+</script>
+
+<div id="termsModalOverlay" class="modal-overlay" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal">
+        <div class="modal-header">Terms and Conditions <button type="button" class="modal-close">&times;</button></div>
+        <div class="modal-body" style="max-height:60vh; overflow:auto;">
+            <h4>Waiver and Liability Release</h4>
+            <p><strong>Sewing Made Simple for Kids Safety Protocol*</strong></p>
+            <p>You must agree to following these safety procedures in order for all sewers and their families to feel comfortable this summer. Please read carefully.</p>
+            <ul>
+                <li>There will be a maximum of 6 campers allowed in each session.</li>
+                <li>Each camper will be required to use hand sanitizer (provided) as they enter the sewing room.</li>
+                <li>Camper's machines will be assigned a machine for the week that will be placed 7ft apart and from other campers and each camper will have an assigned cutting spot.</li>
+                <li>Camper's will be required to maintain social distancing during each class with other campers.</li>
+                <li>Sewing Equipment and sewing room surfaces and the restroom will be disinfected before and after each camp session.</li>
+                <li>Campers are required to wear a mask daily throughout camp and bring their own water bottle.</li>
+                <li>If any camper or family member of the camper's family shows any signs of a fever, any contagious cold symptoms or stomach flu symptoms, a parent will keep that child home until they have recovered. Please notify Ms. Jen immediately.</li>
+                <li>All campers/parents must read and sign the Covid-19 form.</li>
+            </ul>
+            <p><strong>Terms*</strong></p>
+            <p>Please read carefully.</p>
+            <p>I recognize and acknowledge that there are inherent risks in my child’s presence and participation in Sewing Made Simple for Kids Sewing Camps. I acknowledge that this Accident Waiver and Release of Liability form will be used by Sewing Made Simple for kids, and that it will govern my actions and responsibilities at said events. In consideration of my registration and participation in this event, I hereby take action for my child as follows:</p>
+            <p>(A) I hereby expressly agree that the Sewing Made Simple for Kids, its directors, officers, employees, volunteers, representatives and agents, event holders, event sponsors and event directors (all hereinafter referred to as SMSK) shall not be liable for any damages arising from personal and/or bodily injury, including death or property damage sustained by my child, myself or my guest while participating in Sewing Made Simple for Kids Sewing Camps and Holiday Workshops. I assume full responsibility for any such injuries or damages that may occur. I also specifically agree that SMSK shall not be responsible for any such injuries, loss or damage even in the event of negligence or fault by SMSK.</p>
+            <p>(B) Indemnify and Hold Harmless the entities or persons mentioned in this paragraph from any and all liabilities or claims made by other individuals and entities as a result of any of my actions during this event.</p>
+            <p>I am aware the SMSK does not provide health and accident coverage for my child and it is my responsibility to pay any medical bills from injuries sustained while participating in Sewing Made Simple for Kids Sewing Camps and Holiday Workshops.</p>
+            <p>I hereby consent for my child to receive medical treatment which may be deemed advisable in the event of injury, accident and/or illness during this event.</p>
+            <p>I understand that at this event or related activities, my child may be photographed. I agree to allow their photo, video or film likeness to be used for any legitimate purpose by SMSK.</p>
+            <p>(C) I voluntarily agree to assume all of the foregoing risks and accept sole responsibility for any injury to my child(ren) or myself (including, but not limited to, personal injury, disability, and death), illness, damage, loss, claim, liability, or expense, of any kind, that I or my child(ren) may experience or incur in connection with my child(ren)’s attendance at camp (“Claims”). On my behalf, and on behalf of my children, I hereby release, covenant not to sue, discharge, and hold harmless Sewing Made Simple for Kids Sewing Camps and Holiday Workshops, its employees, agents, and representatives, of and from the Claims, including all liabilities, claims, actions, damages, costs or expenses of any kind arising out of or relating thereto. The parties acknowledge and agree that this registration form and corresponding Release and Waiver of Liability and Assumption of Risk Agreement may be executed by electronic signature, which shall be considered as an original signature for all purposes and shall have the same force and effect as an original signature.</p>
+            <p>I HAVE READ AND FULLY UNDERSTAND BOTH THE WAIVER AND LIABILITY RELEASE OF CLAIM FORMS. (By checking the box, you agree to and accept the terms listed above.)*</p>
+        </div>
+        <div style="text-align:right; margin-top:8px;">
+            <button type="button" class="modal-close" style="padding: 8px 16px; background: #ddd; border-radius: 4px; border:none; cursor:pointer;">Close</button>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

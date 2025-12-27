@@ -1,0 +1,125 @@
+<!--Garrett Safsten, Will Knudson, Willard Richards, and Logan Johnson
+This view is so the admin can edit an existing session.-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin - Edit Session</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* UNIFIED CSS STYLING */
+/* PAGE BACKGROUND AND LAYOUT */
+body{background:linear-gradient(180deg,#fffefa 0%, #f6f9ff 100%); font-family:'Nunito', Arial, sans-serif; margin:0; padding:22px; color:#222}
+
+/* MAIN CONTAINER */
+.container{max-width:700px; margin:18px auto; background:#fff; padding:30px; border-radius:10px; box-shadow:0 10px 30px rgba(11,63,136,0.06)}
+
+/* PAGE HEADING */
+h2{color:#d6336c; font-family:'Fredoka', sans-serif; margin-top:0;}
+
+/* FORM GROUP SPACING */
+.form-group { margin-bottom: 15px; }
+
+/* FORM LABELS */
+label{display:block; margin-bottom:6px; font-weight:700; color:#2a3d66}
+
+/* FORM INPUT ELEMENTS */
+input, select, textarea { width: 100%; padding: 10px; border: 1px solid #e6e9ef; border-radius: 8px; box-sizing: border-box; font-family: inherit; }
+
+/* TWO-COLUMN LAYOUT FOR FORM ROWS */
+.row { display: flex; gap: 15px; margin-bottom: 0; }
+.col { flex: 1; min-width: 0; }
+
+/* SUBMIT BUTTON (WITH AMBER/ORANGE GRADIENT FOR EDIT ACTION) */
+.btn-submit{background:linear-gradient(135deg,#f59e0b,#d97706); color:#fff; padding:12px 18px; border-radius:8px; border:none; font-weight:700; cursor: pointer; display: block; width: 100%; margin-top: 20px;}
+
+/* BACK BUTTON */
+.btn-back{display:inline-block; color:#555; margin-bottom:12px; text-decoration: none; font-weight: bold;}
+
+/* RESPONSIVE DESIGN - STACK COLUMNS ON MOBILE */
+@media(max-width:700px){ .row{flex-direction:column; gap:0;} }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <!-- BACK BUTTON TO SCHEDULE PAGE -->
+    <a href="/campschedule" class="btn-back">← Back to Schedule</a>
+    
+    <!-- PAGE TITLE -->
+    <h2>Edit Session</h2>
+
+    <!-- SESSION EDIT FORM - PRE-POPULATED WITH EXISTING SESSION DATA -->
+    <form action="/admin/schedule/edit/<%= session.Sessionid %>" method="POST">
+        <!-- SESSION NAME INPUT -->
+        <div class="form-group">
+            <label>Session Name*</label>
+            <input type="text" name="Sessionname" value="<%= session.Sessionname %>" required>
+        </div>
+
+        <!-- SEASON/HOLIDAY SELECTION WITH CURRENT SEASON PRE-SELECTED -->
+        <div class="form-group">
+            <label>Holiday/Season*</label>
+            <select name="season" required>
+                <option value="Valentine" <%= session.season === 'Valentine' ? 'selected' : '' %>>Valentine</option>
+                <option value="Easter" <%= session.season === 'Easter' ? 'selected' : '' %>>Easter</option>
+                <option value="Summer" <%= session.season === 'Summer' || !session.season ? 'selected' : '' %>>Summer</option>
+                <option value="Halloween" <%= session.season === 'Halloween' ? 'selected' : '' %>>Halloween</option>
+                <option value="Christmas" <%= session.season === 'Christmas' ? 'selected' : '' %>>Christmas</option>
+            </select>
+        </div>
+
+        <!-- SESSION DESCRIPTION -->
+        <div class="form-group">
+            <label>Description*</label>
+            <input type="text" name="Sessiondesc" value="<%= session.Sessiondesc %>" required>
+        </div>
+        
+        <!-- MAXIMUM CAPACITY/SEATS FOR SESSION -->
+        <div class="form-group">
+            <label>Max Seats (Capacity)*</label>
+            <input type="number" name="numseats" value="<%= session.numseats %>" required>
+        </div>
+
+        <!-- START AND END DATES FOR SESSION WITH DATE FORMATTING HELPER (two-column layout) -->
+        <div class="row">
+            <div class="col form-group">
+                <label>Start Date*</label>
+                <% 
+                   /* DATE FORMATTING HELPER - Converts database date format to YYYY-MM-DD format for input field */
+                   const formatDate = (d) => {
+                       if(!d) return '';
+                       const date = new Date(d);
+                       const yyyy = date.getFullYear();
+                       const mm = String(date.getMonth() + 1).padStart(2, '0');
+                       const dd = String(date.getDate()).padStart(2, '0');
+                       return `${yyyy}-${mm}-${dd}`;
+                   };
+                %>
+                <input type="date" name="startdate" value="<%= formatDate(session.startdate) %>" required>
+            </div>
+            <div class="col form-group">
+                <label>End Date*</label>
+                <input type="date" name="enddate" value="<%= formatDate(session.enddate) %>" required>
+            </div>
+        </div>
+
+        <!-- START AND END TIMES FOR SESSION (two-column layout) -->
+        <div class="row">
+            <div class="col form-group">
+                <label>Start Time*</label>
+                <input type="time" name="starttime" value="<%= session.starttime %>" required>
+            </div>
+            <div class="col form-group">
+                <label>End Time*</label>
+                <input type="time" name="endtime" value="<%= session.endtime %>" required>
+            </div>
+        </div>
+
+        <!-- SUBMIT BUTTON TO UPDATE SESSION -->
+        <button type="submit" class="btn-submit">Update Session</button>
+    </form>
+</div>
+
+</body>
+</html>

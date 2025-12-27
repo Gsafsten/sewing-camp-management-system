@@ -1,0 +1,114 @@
+<!--Garrett Safsten, Will Knudson, Willard Richards, and Logan Johnson
+This is so the admin can add a new session to the schedule.-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin - Add Session</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* UNIFIED CSS STYLING */
+/* PAGE BACKGROUND AND LAYOUT */
+body{background:linear-gradient(180deg,#fffefa 0%, #f6f9ff 100%); font-family:'Nunito', Arial, sans-serif; margin:0; padding:22px; color:#222}
+
+/* MAIN CONTAINER */
+.container{max-width:700px; margin:18px auto; background:#fff; padding:30px; border-radius:10px; box-shadow:0 10px 30px rgba(11,63,136,0.06)}
+
+/* PAGE HEADING */
+h2{color:#d6336c; font-family:'Fredoka', sans-serif; margin-top:0;}
+
+/* FORM GROUP SPACING */
+.form-group { margin-bottom: 15px; }
+
+/* FORM LABELS */
+label{display:block; margin-bottom:6px; font-weight:700; color:#2a3d66}
+
+/* FORM INPUT ELEMENTS */
+input, select, textarea { width: 100%; padding: 10px; border: 1px solid #e6e9ef; border-radius: 8px; box-sizing: border-box; font-family: inherit; }
+
+/* TWO-COLUMN LAYOUT FOR FORM ROWS */
+.row { display: flex; gap: 15px; margin-bottom: 0; }
+.col { flex: 1; min-width: 0; }
+
+/* SUBMIT BUTTON */
+.btn-submit{background:linear-gradient(135deg,#10b981,#0ea77a); color:#fff; padding:12px 18px; border-radius:8px; border:none; font-weight:700; cursor: pointer; display: block; width: 100%; margin-top: 20px;}
+
+/* BACK BUTTON */
+.btn-back{display:inline-block; color:#555; margin-bottom:12px; text-decoration: none; font-weight: bold;}
+
+/* RESPONSIVE DESIGN - STACK COLUMNS ON MOBILE */
+@media(max-width:700px){ .row{flex-direction:column; gap:0;} }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <!-- BACK BUTTON TO SCHEDULE PAGE -->
+    <a href="/campschedule" class="btn-back">← Back to Schedule</a>
+    
+    <!-- PAGE TITLE -->
+    <h2>Add New Session</h2>
+
+    <!-- SESSION CREATION FORM - COLLECTS ALL SCHEDULE DETAILS -->
+    <form action="/admin/schedule/add" method="POST">
+        <!-- SESSION NAME INPUT -->
+        <div class="form-group">
+            <label>Session Name*</label>
+            <input type="text" name="Sessionname" placeholder="e.g. Session 1" required>
+        </div>
+        
+        <!-- SEASON/HOLIDAY SELECTION -->
+        <div class="form-group">
+            <label>Holiday/Season*</label>
+            <select name="season" required>
+                <option value="Valentine">Valentine</option>
+                <option value="Easter">Easter</option>
+                <option value="Summer" selected>Summer</option>
+                <option value="Halloween">Halloween</option>
+                <option value="Christmas">Christmas</option>
+            </select>
+        </div>
+
+        <!-- SESSION DESCRIPTION -->
+        <div class="form-group">
+            <label>Description*</label>
+            <input type="text" name="Sessiondesc" placeholder="e.g. Sewing Camp!" value="Sewing Camp!" required>
+        </div>
+        
+        <!-- MAXIMUM CAPACITY/SEATS FOR SESSION -->
+        <div class="form-group">
+            <label>Max Seats (Capacity)*</label>
+            <input type="number" name="numseats" placeholder="e.g. 8" required>
+        </div>
+
+        <!-- START AND END DATES FOR SESSION (two-column layout) -->
+        <div class="row">
+            <div class="col form-group">
+                <label>Start Date*</label>
+                <input type="date" name="startdate" required>
+            </div>
+            <div class="col form-group">
+                <label>End Date*</label>
+                <input type="date" name="enddate" required>
+            </div>
+        </div>
+
+        <!-- START AND END TIMES FOR SESSION (two-column layout) -->
+        <div class="row">
+            <div class="col form-group">
+                <label>Start Time*</label>
+                <input type="time" name="starttime" required>
+            </div>
+            <div class="col form-group">
+                <label>End Time*</label>
+                <input type="time" name="endtime" required>
+            </div>
+        </div>
+
+        <!-- SUBMIT BUTTON TO CREATE NEW SESSION -->
+        <button type="submit" class="btn-submit">Add Session</button>
+    </form>
+</div>
+
+</body>
+</html>

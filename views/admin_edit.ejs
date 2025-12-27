@@ -1,0 +1,199 @@
+<!--Garrett Safsten, Will Knudson, Willard Richards, and Logan Johnson
+This view is so the admin can edit an already existing participant.-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - Edit Registration</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* PAGE BACKGROUND AND LAYOUT */
+        body { background: #f6f9ff; font-family: 'Nunito', sans-serif; padding: 20px; }
+        
+        /* MAIN CONTAINER */
+        .container { max-width: 700px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 10px 30px rgba(11,63,136,0.06); }
+        
+        /* PAGE HEADING */
+        h2 { color: #f59e0b; font-family: 'Fredoka', sans-serif; }
+        
+        /* FORM GROUP SPACING */
+        .form-group { margin-bottom: 15px; }
+        
+        /* FORM LABELS */
+        label { display: block; font-weight: bold; margin-bottom: 5px; color: #333; }
+        
+        /* FORM INPUT ELEMENTS */
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        
+        /* SUBMIT BUTTON (AMBER/ORANGE FOR EDIT ACTION) */
+        .btn-submit { background: #f59e0b; color: white; padding: 12px; border: none; width: 100%; border-radius: 5px; font-weight: bold; cursor: pointer; }
+        
+        /* BACK BUTTON */
+        .back-link { display: inline-block; margin-bottom: 15px; text-decoration: none; color: #555; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="/admin" class="back-link">← Back to Dashboard</a>
+    <h2>Edit Registration</h2>
+
+    <form action="/admin/edit/<%= record.reg_id %>" method="POST">
+        
+        <input type="hidden" name="child_id" value="<%= record.childid %>">
+        <input type="hidden" name="parent_id" value="<%= record.parentid %>">
+        <input type="hidden" name="address_id" value="<%= record.addressid %>">
+        <input type="hidden" name="class_id" value="<%= record.classid %>">
+
+        <% 
+            /* DETERMINE CURRENT SEASON FROM SESSION LIST */
+            /* Finds the current session object to display the correct season in dropdown */
+            const currentSessionObj = sessions.find(s => s.Sessionid === record.Sessionid);
+            const currentSeason = currentSessionObj ? (currentSessionObj.season || 'Summer') : '';
+        %>
+
+        <!-- SEASON DROPDOWN WITH DYNAMIC SESSION FILTERING -->
+        <div class="form-group">
+            <label>Select Season:</label>
+            <select id="season" onchange="filterAdminSessions()" required>
+                <option value="Valentine" <%= currentSeason === 'Valentine' ? 'selected' : '' %>>Valentine</option>
+                <option value="Easter" <%= currentSeason === 'Easter' ? 'selected' : '' %>>Easter</option>
+                <option value="Summer" <%= currentSeason === 'Summer' ? 'selected' : '' %>>Summer</option>
+                <option value="Halloween" <%= currentSeason === 'Halloween' ? 'selected' : '' %>>Halloween</option>
+                <option value="Christmas" <%= currentSeason === 'Christmas' ? 'selected' : '' %>>Christmas</option>
+            </select>
+        </div>
+
+        <!-- SESSION DROPDOWN - POPULATED BY JAVASCRIPT BASED ON SELECTED SEASON -->
+        <div class="form-group">
+            <label>Select Session:</label>
+            <select id="selected_session" name="selected_session" required>
+                </select>
+        </div>
+
+        <!-- PARTICIPANT NAME (FIRST AND LAST) - TWO-COLUMN LAYOUT -->
+        <div style="display:flex; gap:15px;">
+            <div class="form-group" style="flex:1;">
+                <label>First Name</label>
+                <input type="text" name="first_name" value="<%= record.first_name %>" required>
+            </div>
+            <div class="form-group" style="flex:1;">
+                <label>Last Name</label>
+                <input type="text" name="last_name" value="<%= record.last_name %>" required>
+            </div>
+        </div>
+        
+        <!-- PARTICIPANT BIRTHDATE AND AGE - TWO-COLUMN LAYOUT (Age is auto-calculated) -->
+        <div style="display:flex; gap:15px;">
+            <div class="form-group" style="flex:1;">
+                <label>Birthdate</label>
+                <% 
+                    /* CONVERT DATABASE DATE FORMAT TO HTML5 DATE INPUT FORMAT (YYYY-MM-DD) */
+                    const dob = new Date(record.birthdate);
+                    const dobStr = dob.toISOString().split('T')[0];
+                %>
+                <input type="date" name="birthdate" value="<%= dobStr %>" required>
+            </div>
+            <div class="form-group" style="flex:1;">
+                <label>Age</label>
+                <input type="number" name="age" value="<%= record.childage %>" required>
+            </div>
+        </div>
+
+        <!-- PARENT/GUARDIAN INFORMATION SECTION -->
+        <h3>Parent Info</h3>
+        <div class="form-group"><label>Parent First Name</label><input type="text" name="parent_first_name" value="<%= record.parentfirstname %>" required></div>
+        <div class="form-group"><label>Parent Last Name</label><input type="text" name="parent_last_name" value="<%= record.parentlastname %>" required></div>
+        <div class="form-group"><label>Email</label><input type="email" name="email" value="<%= record.email %>" required></div>
+        <div class="form-group"><label>Phone</label><input type="text" name="phone" value="<%= record.phone %>" required></div>
+
+        <!-- ADDRESS INFORMATION SECTION -->
+        <h3>Address</h3>
+        <div class="form-group"><label>Street</label><input type="text" name="street_address" value="<%= record.streetaddress %>" required></div>
+        <div style="display:flex; gap:10px;">
+            <input type="text" name="city" placeholder="City" value="<%= record.city %>" required>
+            <input type="text" name="state" placeholder="State" value="<%= record.state %>" required>
+            <input type="text" name="zipcode" placeholder="Zip" value="<%= record.zipcode %>" required>
+        </div>
+
+        <!-- SPECIAL NOTES/REQUESTS FIELD -->
+        <div class="form-group">
+            <label>Notes</label>
+            <textarea name="special_requests"><%= record.special_requests %></textarea> </div>
+
+        <!-- WAIVER AGREEMENT CHECKBOX -->
+        <div class="form-group">
+            <label>
+                <input type="checkbox" name="agree" style="width:auto;" <%= record.waiver === 'Y' ? 'checked' : '' %> required> Waiver Signed
+            </label>
+        </div>
+
+        <!-- SUBMIT BUTTON TO UPDATE REGISTRATION -->
+        <button type="submit" class="btn-submit">Update Registration</button>
+    </form>
+</div>
+
+<script>
+    /* SESSION DATA AND CURRENT SESSION TRACKING */
+    const sessions = <%- JSON.stringify(sessions || []) %>;
+    const currentSessionId = <%= record.Sessionid %>;
+
+    /* FUNCTION TO FILTER AVAILABLE SESSIONS BY SELECTED SEASON */
+    /* Dynamically populates the session dropdown based on the selected season */
+    function filterAdminSessions() {
+        const seasonVal = document.getElementById('season').value;
+        const sessionSelect = document.getElementById('selected_session');
+        
+        /* CLEAR EXISTING OPTIONS */
+        sessionSelect.innerHTML = '<option value="">-- Select Session --</option>';
+
+        /* EXIT IF NO SEASON SELECTED */
+        if(!seasonVal) return;
+
+        /* FILTER SESSIONS BY SELECTED SEASON FROM DATABASE */
+        const filtered = sessions.filter(s => (s.season || 'Summer') === seasonVal);
+
+        /* POPULATE SESSION OPTIONS IF SESSIONS EXIST FOR SEASON */
+        if(filtered.length > 0) {
+            filtered.forEach(sess => {
+                const opt = document.createElement('option');
+                opt.value = sess.Sessionid;
+                
+                /* CHECK CAPACITY STATUS OF SESSION */
+                const enrolled = parseInt(sess.enrolled_count || 0);
+                const max = parseInt(sess.numseats || 0);
+                /* Important: Don't mark as full if this is the user's CURRENT session */
+                const isFull = (enrolled >= max);
+                const isCurrent = (sess.Sessionid === currentSessionId);
+
+                /* FORMAT SESSION DISPLAY TEXT WITH DATE */
+                let txt = `${sess.Sessionname} (${new Date(sess.startdate).toLocaleDateString()})`;
+                
+                /* MARK CURRENT SELECTION, FULL SESSIONS, OR SHOW ENROLLMENT COUNT */
+                if(isCurrent) {
+                    opt.selected = true;
+                    txt += " (Current Selection)";
+                } else if(isFull) {
+                    txt += " - FULL";
+                    opt.disabled = true;
+                    opt.style.color = "#999";
+                } else {
+                    txt += ` (${enrolled}/${max})`;
+                }
+
+                opt.textContent = txt;
+                sessionSelect.appendChild(opt);
+            });
+        } else {
+            /* NO SESSIONS AVAILABLE FOR SELECTED SEASON */
+            const opt = document.createElement('option');
+            opt.textContent = "No sessions found";
+            sessionSelect.appendChild(opt);
+        }
+    }
+
+    // Run on load to populate dropdown with current data
+    document.addEventListener('DOMContentLoaded', filterAdminSessions);
+</script>
+</body>
+</html>

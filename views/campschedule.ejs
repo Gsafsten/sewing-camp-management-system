@@ -1,0 +1,757 @@
+<!--Garrett Safsten, Will Knudson, Willard Richards, and Logan Johnson
+This view contains the camp schedule and the admin has the ability to add, edit, and delete schedule items.-->
+<!-- NOTE: Server injects `sessions` into this page (available as `dbData` in the script).
+    The calendar and table rendering code below read `dbData` to build the year calendar,
+    badges, and availability tooltips. Keep EJS JSON injections intact. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Camp Schedule - Sewing Camp</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+
+<!-- STYLE: Page styles for schedule listing and admin controls. 
+    This block contains navbar, table and responsive rules. -->
+
+<style>
+/* Unified theme: professional + fun */
+body {
+    background: linear-gradient(180deg,#fffefa 0%, #f6f9ff 100%);
+    font-family: 'Nunito', Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    color: #222;
+}
+
+/* Navigation Bar Styles */
+.navbar {
+    background: linear-gradient(135deg, #2a3d66 0%, #0b3d8a 100%);
+    padding: 0;
+    margin: 0 auto 20px;
+    border-radius: 10px;
+    box-shadow: 0 6px 20px rgba(42, 61, 102, 0.2);
+    max-width: 900px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.navbar-brand {
+    display: none;
+}
+
+.navbar-menu {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    flex-wrap: wrap;
+}
+
+.navbar-item {
+    position: relative;
+}
+
+.navbar-item a {
+    display: block;
+    padding: 18px 16px;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    transition: background-color 0.3s, color 0.3s;
+    border-bottom: 3px solid transparent;
+}
+
+.navbar-item a:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    border-bottom-color: #ff8fab;
+}
+
+.navbar-item a.active {
+    border-bottom-color: #ff8fab;
+    color: #ffb8c8;
+}
+
+.navbar-actions {
+    display: flex;
+    gap: 8px;
+    padding: 8px 15px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.btn-login {
+    background: linear-gradient(135deg, #ff8fab, #d6336c);
+    color: #fff;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: box-shadow 0.3s, transform 0.2s;
+}
+
+.btn-login:hover {
+    box-shadow: 0 6px 16px rgba(214, 51, 108, 0.35);
+    transform: translateY(-2px);
+}
+
+.btn-admin {
+    background: linear-gradient(135deg, #0b63ff, #0452d4);
+    color: #fff;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: box-shadow 0.3s, transform 0.2s;
+}
+
+.btn-admin:hover {
+    box-shadow: 0 6px 16px rgba(11, 99, 255, 0.35);
+    transform: translateY(-2px);
+}
+
+.btn-logout {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: #fff;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: box-shadow 0.3s, transform 0.2s;
+}
+
+.btn-logout:hover {
+    box-shadow: 0 6px 16px rgba(239, 68, 68, 0.35);
+    transform: translateY(-2px);
+}
+
+/* Admin specific buttons for schedule */
+.btn-schedule-add {
+    background: #10b981;
+    color: white;
+    padding: 8px 15px;
+    text-decoration: none;
+    border-radius: 20px; /* More rounded */
+    font-weight: bold;
+    font-size: 13px;
+    display: inline-block;
+    margin-bottom: 10px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+.btn-schedule-add:hover { transform: translateY(-2px); }
+
+.btn-schedule-edit {
+    background: #f59e0b;
+    color: white;
+    padding: 5px 10px;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 11px;
+    margin-right: 4px;
+}
+.btn-schedule-delete {
+    background: #ef4444;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+    }
+    .navbar-brand {
+        width: 100%;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .navbar-menu {
+        width: 100%;
+        justify-content: center;
+    }
+    .navbar-item a {
+        padding: 12px 12px;
+        font-size: 13px;
+    }
+    .navbar-actions {
+        width: 100%;
+        padding: 12px 15px;
+        justify-content: center;
+    }
+}
+.style13 {font-family:'Fredoka', sans-serif; font-weight:700; color:#d6336c; font-size:22px}
+.style14 {font-family:'Nunito', Arial, sans-serif; color:#475569; font-size: 16px; line-height: 1.5;}
+table[width="700"] {
+    padding: 25px;
+    margin: 0 auto;
+}
+img[alt="Sewing Made Simple for Kids Banner"]{display:block;margin:10px auto;max-width:552px;width:100%;height:auto}
+
+/* Status Colors for Table */
+.status-open { color: #10b981; font-weight: 800; background: #ecfdf5; padding: 4px 8px; border-radius: 12px; font-size: 0.9em; }
+.status-full { color: #ef4444; font-weight: 800; background: #fef2f2; padding: 4px 8px; border-radius: 12px; font-size: 0.9em; }
+
+/* --- NEW TAB STYLES --- */
+.tab-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+    border-bottom: 2px solid #eef2f6;
+    flex-wrap: wrap;
+}
+
+.tab-btn {
+    padding: 12px 24px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    color: #94a3b8;
+    border-bottom: 4px solid transparent;
+    transition: all 0.3s ease;
+    margin-bottom: -2px; /* overlaps border */
+}
+
+.tab-btn:hover {
+    color: #64748b;
+    background-color: #f8fafc;
+    border-radius: 8px 8px 0 0;
+}
+
+.tab-btn.active {
+    color: #2a3d66;
+    border-bottom: 4px solid #2a3d66;
+}
+
+/* Specific Tab Colors for Active State */
+.tab-btn[data-tab="Valentine"].active { color: #db2777; border-bottom-color: #db2777; }
+.tab-btn[data-tab="Easter"].active { color: #9333ea; border-bottom-color: #9333ea; }
+.tab-btn[data-tab="Summer"].active { color: #059669; border-bottom-color: #059669; }
+.tab-btn[data-tab="Halloween"].active { color: #ea580c; border-bottom-color: #ea580c; }
+.tab-btn[data-tab="Christmas"].active { color: #dc2626; border-bottom-color: #dc2626; }
+
+/* --- MODERN TABLE STYLES --- */
+.table-responsive {
+    overflow-x: auto;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    border-radius: 12px;
+    background: white;
+}
+
+.schedule-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    min-width: 600px; /* Ensures table doesn't squish too much on mobile */
+}
+
+.schedule-table thead tr {
+    background-color: #f8fafc;
+    text-align: left;
+}
+
+.schedule-table th {
+    padding: 18px 20px;
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 600;
+    color: #475569;
+    border-bottom: 2px solid #e2e8f0;
+    font-size: 15px;
+}
+
+.schedule-table td {
+    padding: 16px 20px;
+    border-bottom: 1px solid #f1f5f9;
+    color: #334155;
+    vertical-align: middle;
+}
+
+.schedule-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.schedule-table tbody tr:hover {
+    background-color: #fdfdfd;
+}
+
+/* Row animation */
+.session-row {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+
+</head>
+<body>
+
+<table border="0" cellspacing="0" cellpadding="0" width="700">
+<tr>
+<td colspan="16"></td>
+<td rowspan="2" colspan="4"></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="16"></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="18"></td>
+<td></td>
+</tr>
+</table>
+
+<div style="max-width: 700px; margin: 0 auto 20px; text-align: center;">
+    <img src="/images/SewingMadeSimpleForKidsBanner.png" width="552" height="100" alt="Sewing Made Simple for Kids Banner">
+</div>
+
+<!-- NAVIGATION: Top-level links for site pages (Home, Camp Info, Schedule, Registration, Contact) -->
+<nav class="navbar" role="navigation" aria-label="Main">
+    <ul class="navbar-menu">
+        <li class="navbar-item"><a href="/">Home</a></li>
+        <li class="navbar-item"><a href="/campinfo">Camp Info</a></li>
+        <li class="navbar-item"><a href="/campschedule">Schedule</a></li>
+        <li class="navbar-item"><a href="/registrations">Registration</a></li>
+        <li class="navbar-item"><a href="/contactus">Contact</a></li>
+    </ul>
+    <div class="navbar-actions">
+        <% if (user) { %>
+            <a href="/admin" class="btn-admin">Admin</a>
+            <a href="/logout" class="btn-logout">Logout</a>
+        <% } else { %>
+            <a href="/login" class="btn-login">Login</a>
+        <% } %>
+    </div>
+</nav>
+
+<table border="0" cellspacing="0" cellpadding="0" width="700">
+    <tr>
+        <td bgcolor="#ffffff" valign="top" colspan="18">
+            <p class="style13">Camp Schedule</p>
+            <p class="style14">Our camp offers a structured schedule with a mix of instructional sessions, creative project time, and fun breaks. Select a holiday tab below to see specific schedules.</p>
+
+            <div class="tab-container">
+                <button class="tab-btn active" data-tab="All" onclick="filterSchedule('All')">All</button>
+                <button class="tab-btn" data-tab="Valentine" onclick="filterSchedule('Valentine')">Valentine</button>
+                <button class="tab-btn" data-tab="Easter" onclick="filterSchedule('Easter')">Easter</button>
+                <button class="tab-btn" data-tab="Summer" onclick="filterSchedule('Summer')">Summer</button>
+                <button class="tab-btn" data-tab="Halloween" onclick="filterSchedule('Halloween')">Halloween</button>
+                <button class="tab-btn" data-tab="Christmas" onclick="filterSchedule('Christmas')">Christmas</button>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 0 5px;">
+                <h3 id="schedule-heading" style="margin: 0; color: #2a3d66; font-family:'Fredoka', sans-serif;">All Schedules:</h3>
+                <% if (user) { %>
+                    <a href="/admin/schedule/add" class="btn-schedule-add">+ Add New Session</a>
+                <% } %>
+            </div>
+            
+            <!-- SCHEDULE TABLE: Lists each session with dates, times, capacity, and admin actions -->
+            <div class="table-responsive">
+                <table class="schedule-table" id="session-table">
+                    <thead>
+                        <tr>
+                            <th width="25%">Session Name</th>
+                            <th width="30%">Description</th>
+                            <th width="25%">Date & Time</th>
+                            <th width="15%" style="text-align: center;">Availability</th>
+                            <% if (user) { %> <th>Actions</th> <% } %>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (typeof sessions !== 'undefined' && sessions.length > 0) { %>
+                            <% sessions.forEach(function(session) { 
+                                // Format helper for dates
+                                const formatD = (d) => {
+                                    const date = new Date(d);
+                                    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                                    const mon = months[date.getMonth()];
+                                    const dd = String(date.getDate()).padStart(2, '0');
+                                    const yyyy = date.getFullYear();
+                                    return `${mon}-${dd}-${yyyy}`;
+                                };
+
+                                // Format helper for time
+                                const formatT = (t) => {
+                                    if (!t) return '';
+                                    let [hours, minutes] = t.split(':');
+                                    hours = parseInt(hours);
+                                    const ampm = hours >= 12 ? 'PM' : 'AM';
+                                    hours = hours % 12;
+                                    hours = hours ? hours : 12; 
+                                    return `${hours}:${minutes}${ampm}`;
+                                };
+
+                                const enrolled = session.enrolled_count || 0;
+                                const maxSeats = session.numseats || 0;
+                                const isFull = enrolled >= maxSeats;
+                                const currentSeason = session.season || 'Summer';
+                            %>
+                            <tr class="session-row" data-season="<%= currentSeason %>">
+                                <td style="font-weight: bold; color: #2a3d66;"><%= session.Sessionname %></td>
+                                <td><%= session.Sessiondesc %></td>
+                                <td>
+                                    <div style="font-weight: 600;"><%= formatD(session.startdate) %> - <%= formatD(session.enddate) %></div>
+                                    <div style="color: #64748b; font-size: 0.9em;"><%= formatT(session.starttime) %> - <%= formatT(session.endtime) %></div>
+                                </td>
+                                <td align="center">
+                                    <span class="<%= isFull ? 'status-full' : 'status-open' %>">
+                                        <%= enrolled %>/<%= maxSeats %> <%= isFull ? '(Full)' : '' %>
+                                    </span>
+                                </td>
+
+                                <% if (user) { %>
+                                    <td style="white-space: nowrap;">
+                                        <a href="/admin/schedule/edit/<%= session.Sessionid %>" class="btn-schedule-edit">Edit</a>
+                                        <form action="/admin/schedule/delete/<%= session.Sessionid %>" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure? This will delete the session from the calendar.');">
+                                            <button type="submit" class="btn-schedule-delete">Del</button>
+                                        </form>
+                                    </td>
+                                <% } %>
+                            </tr>
+                            <% }); %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="<%= user ? 5 : 4 %>" style="text-align: center; padding: 30px;">No sessions scheduled at this time.</td>
+                            </tr>
+                        <% } %>
+                        <tr id="no-sessions-msg" style="display:none;">
+                            <td colspan="<%= user ? 5 : 4 %>" style="text-align: center; padding: 30px; color: #64748b;">No sessions found for this season.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p class="style14" style="margin-top: 20px;">Schedules may vary depending on the age group and session. Each camper receives personal guidance and support throughout their time at camp.</p>
+        </td>
+    </tr>
+</table>
+
+<style>
+/* Year calendar styles */
+.calendar-wrapper{
+    max-width:1000px; /* REDUCED WIDTH for smaller appearance */
+    margin:22px auto;
+    padding:20px;
+    background:#fff;
+    border-radius:12px;
+    box-shadow:0 10px 30px rgba(11,63,136,0.04);
+}
+.year-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;justify-items:start}
+.month-card{padding:10px;border-radius:8px;background:#fbfbfe;border:1px solid #eef2f6;width:100%;box-sizing:border-box}
+.month-title{font-weight:800;color:var(--nav-dark-1,#2a3d66);margin-bottom:8px;text-align:center; font-size: 14px;}
+
+/* Month Grid - Tight gap for continuous blocks */
+.month-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px; background: #eee; border: 1px solid #eee;}
+
+.cal-weekday{font-weight:700;text-align:center;color:#475569;font-size:11px;margin-bottom: 4px; background: #fff;}
+
+/* Base Day Style - Compact */
+.cal-day{
+    min-height:45px; /* REDUCED HEIGHT */
+    padding:2px;
+    background:#fff;
+    display:flex;
+    flex-direction:column;
+    position: relative;
+    font-size: 12px;
+}
+.cal-day.outside{opacity:0.3; background: #f9f9f9;}
+.cal-day .date-num{font-weight:700; z-index: 2; margin-left: 2px;}
+
+/* THEME VARIABLES (Default is Summer/Green) */
+.calendar-wrapper {
+    --theme-bg: #d1fae5;
+    --theme-border: #10b981;
+    --theme-text: #065f46;
+}
+
+.calendar-wrapper.theme-valentine { --theme-bg: #ffe4e6; --theme-border: #ec4899; --theme-text: #831843; } /* Pink */
+.calendar-wrapper.theme-easter { --theme-bg: #f3e8ff; --theme-border: #a855f7; --theme-text: #6b21a8; } /* Purple */
+.calendar-wrapper.theme-summer { --theme-bg: #d1fae5; --theme-border: #10b981; --theme-text: #065f46; } /* Green */
+.calendar-wrapper.theme-halloween { --theme-bg: #ffedd5; --theme-border: #f97316; --theme-text: #9a3412; } /* Orange */
+.calendar-wrapper.theme-christmas { --theme-bg: #fee2e2; --theme-border: #ef4444; --theme-text: #991b1b; } /* Red */
+.calendar-wrapper.theme-all { --theme-bg: #d1fae5; --theme-border: #10b981; --theme-text: #065f46; } /* Default Green */
+
+
+/* AVAILABLE SESSIONS STYLE */
+.cal-day.session-open {
+    background: var(--theme-bg);
+    color: var(--theme-text);
+}
+
+/* FULL SESSIONS STYLE (Always Grey) */
+.cal-day.session-full {
+    background: #e2e8f0;
+    color: #64748b;
+    opacity: 0.8;
+}
+
+.cal-day.session-open:hover, .cal-day.session-full:hover {
+    filter: brightness(0.95);
+    z-index: 10;
+    cursor: pointer;
+}
+
+/* Badge Logic */
+.session-badge{
+    margin-top:auto;
+    background:#0b63ff;
+    color:#fff;
+    padding:1px 4px;
+    border-radius:8px;
+    font-size:9px;
+    font-weight:800;
+    display:inline-block;
+    align-self: flex-end;
+    margin-right: 2px;
+    margin-bottom: 2px;
+}
+.session-badge.badge-full {
+    background: #64748b; 
+}
+
+/* Tooltip */
+.tooltip{position:fixed;background:#0b3d8a;color:#fff;padding:10px 14px;border-radius:6px;font-size:13px;pointer-events:none;z-index:1200;display:none; line-height: 1.5; box-shadow: 0 4px 12px rgba(0,0,0,0.2);}
+
+@media(max-width:1200px){.year-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:900px){.year-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.year-grid{grid-template-columns:repeat(1,1fr)}}
+</style>
+
+<div id="calWrapper" class="calendar-wrapper theme-all">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div style="font-size:18px;font-weight:800;color:#2a3d66"><span id="cal-title">2025 Session Calendar</span></div>
+        <div style="color:#475569; font-size:13px;">Colored = Open Spots | Grey = Full</div>
+    </div>
+
+    <div class="year-grid" id="yearGrid"></div>
+</div>
+
+<div id="calTooltip" class="tooltip" role="tooltip" aria-hidden="true"></div>
+
+<!-- SCRIPT: Calendar rendering and schedule filtering (uses server-provided sessions data) -->
+<script>
+// Retrieve data passed from the server
+/* CALENDAR SCRIPT: `dbData` contains session objects injected by the server.
+    Below functions provide tab filtering, table filtering, and calendar rendering.
+    No server-side logic is changed; comments only for maintainers. */
+const dbData = <%- JSON.stringify(sessions || []) %>;
+
+// 1. FILTERING LOGIC
+function filterSchedule(season) {
+    // A. Update Active Tab UI
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        if(btn.dataset.tab === season) btn.classList.add('active');
+        else btn.classList.remove('active');
+    });
+
+    // B. Filter Table Rows
+    const rows = document.querySelectorAll('.session-row');
+    let count = 0;
+    rows.forEach(row => {
+        const rowSeason = row.dataset.season;
+        if (season === 'All' || rowSeason === season) {
+            row.style.display = '';
+            count++;
+        } else {
+            row.style.display = 'none';
+        }
+    });
+    
+    // Show/Hide "No Sessions" message
+    const noMsg = document.getElementById('no-sessions-msg');
+    if (count === 0) noMsg.style.display = '';
+    else noMsg.style.display = 'none';
+
+    // Update Header
+    document.getElementById('schedule-heading').textContent = season === 'All' ? 'All Schedules:' : season + ' Schedule:';
+    document.getElementById('cal-title').textContent = season === 'All' ? '2025 Session Calendar' : '2025 ' + season + ' Calendar';
+
+    // C. Update Calendar Theme
+    const wrapper = document.getElementById('calWrapper');
+    // Remove all existing themes
+    wrapper.classList.remove('theme-all', 'theme-valentine', 'theme-easter', 'theme-summer', 'theme-halloween', 'theme-christmas');
+    // Add new theme
+    wrapper.classList.add('theme-' + season.toLowerCase());
+
+    // D. Re-render Calendar with filtered data
+    let filteredData = [];
+    if (season === 'All') {
+        filteredData = dbData;
+    } else {
+        filteredData = dbData.filter(item => (item.season || 'Summer') === season);
+    }
+    renderCalendarData(filteredData);
+}
+
+// 2. CALENDAR RENDERING LOGIC
+function formatTimeJS(t) {
+    if(!t) return '';
+    let [hours, minutes] = t.split(':');
+    hours = parseInt(hours);
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    return `${hours}:${minutes} ${ampm}`;
+}
+
+function renderCalendarData(data) {
+    const sessions = [];
+    
+    // Process data into daily blocks
+    data.forEach(item => {
+        let current = new Date(item.startdate);
+        const end = new Date(item.enddate);
+        const timeString = `${formatTimeJS(item.starttime)}-${formatTimeJS(item.endtime)}`;
+        const enrolled = parseInt(item.enrolled_count || 0);
+        const max = parseInt(item.numseats || 0);
+
+        while (current <= end) {
+            const year = current.getFullYear();
+            const month = String(current.getMonth() + 1).padStart(2, '0');
+            const day = String(current.getDate()).padStart(2, '0');
+            const ymd = `${year}-${month}-${day}`;
+
+            sessions.push({
+                date: ymd,
+                session: item.Sessionname,
+                time: timeString,
+                enrolled: enrolled,
+                max: max
+            });
+            current.setDate(current.getDate() + 1);
+        }
+    });
+
+    const sessionMap = new Map();
+    sessions.forEach(s => { 
+        if (!s.date) return; 
+        const key = s.date; 
+        if (!sessionMap.has(key)) sessionMap.set(key, []); 
+        sessionMap.get(key).push(s); 
+    });
+
+    const container = document.getElementById('yearGrid');
+    container.innerHTML = ''; // Clear existing
+    
+    // Render 12 months for 2025
+    for (let m=0;m<12;m++){ 
+        const monthCard = buildMonth(2025, m, sessionMap); 
+        container.appendChild(monthCard); 
+    } 
+}
+
+function buildMonth(year, monthIndex, sessionMap){
+    const monthCard = document.createElement('div'); monthCard.className='month-card';
+    const title = document.createElement('div'); title.className='month-title';
+    const tmp = new Date(year, monthIndex, 1);
+    title.textContent = tmp.toLocaleString(undefined,{month:'long'});
+    monthCard.appendChild(title);
+
+    const monthGrid = document.createElement('div'); monthGrid.className='month-grid';
+    ['S','M','T','W','T','F','S'].forEach(w=>{const el=document.createElement('div');el.className='cal-weekday';el.textContent=w;monthGrid.appendChild(el);});
+
+    const first = new Date(year, monthIndex, 1);
+    const last = new Date(year, monthIndex+1,0);
+    const startDay = first.getDay(); const total = last.getDate();
+    const prevLast = new Date(year, monthIndex, 0).getDate();
+    
+    for (let i=0;i<startDay;i++){ const d = prevLast - startDay + 1 + i; const el=document.createElement('div'); el.className='cal-day outside'; el.innerHTML=`<div class="date-num">${d}</div>`; monthGrid.appendChild(el); }
+
+    for (let d=1; d<=total; d++){
+        const el = document.createElement('div'); el.className='cal-day'; 
+        const date = new Date(year, monthIndex, d); 
+        const ymd = date.toISOString().slice(0,10);
+        el.innerHTML = `<div class="date-num">${d}</div>`;
+        
+        if (sessionMap.has(ymd)){
+            const sessionsForDay = sessionMap.get(ymd);
+            let availableSessionsCount = 0;
+            let tooltipContent = `<strong>${ymd}</strong><br>`;
+            
+            sessionsForDay.forEach(sess => {
+                const isFull = sess.enrolled >= sess.max;
+                if (!isFull) {
+                    availableSessionsCount++;
+                    tooltipContent += `• ${sess.session}<br>&nbsp;&nbsp;${sess.time} (${sess.enrolled}/${sess.max} filled)<br>`;
+                } else {
+                    tooltipContent += `• ${sess.session} is Full<br>`;
+                }
+            });
+
+            if (availableSessionsCount > 0) {
+                el.classList.add('session-open');
+                const badge = document.createElement('div'); 
+                badge.className='session-badge'; 
+                badge.textContent = availableSessionsCount; 
+                el.appendChild(badge);
+            } else {
+                el.classList.add('session-full');
+                const badge = document.createElement('div'); 
+                badge.className='session-badge badge-full'; 
+                badge.textContent = "0"; 
+                el.appendChild(badge);
+            }
+            el.addEventListener('mouseenter', (ev)=> showTooltip(ev, tooltipContent));
+            el.addEventListener('mouseleave', hideTooltip);
+        }
+        monthGrid.appendChild(el);
+    }
+    const totalCells = monthGrid.childNodes.length; const remainder = (7 - (totalCells % 7)) % 7;
+    for (let i=1;i<=remainder;i++){ const el=document.createElement('div'); el.className='cal-day outside'; el.innerHTML=`<div class="date-num">${i}</div>`; monthGrid.appendChild(el); }
+    monthCard.appendChild(monthGrid);
+    return monthCard;
+}
+
+function showTooltip(ev, content){ 
+    const tip = document.getElementById('calTooltip'); 
+    tip.innerHTML = content; 
+    tip.style.display='block'; 
+    tip.setAttribute('aria-hidden','false'); 
+    positionTooltip(ev); 
+}
+function positionTooltip(ev){ 
+    const tip = document.getElementById('calTooltip'); 
+    const pad=12; 
+    const w=tip.offsetWidth, h=tip.offsetHeight; 
+    let x=ev.clientX+pad, y=ev.clientY+pad; 
+    if (x+w>window.innerWidth) x=ev.clientX-w-pad; 
+    if (y+h>window.innerHeight) y=ev.clientY-h-pad; 
+    tip.style.left = x+'px'; 
+    tip.style.top = y+'px'; 
+}
+function hideTooltip(){ 
+    const tip = document.getElementById('calTooltip'); 
+    tip.style.display='none'; 
+    tip.setAttribute('aria-hidden','true'); 
+}
+document.addEventListener('mousemove',(ev)=>{ const tip = document.getElementById('calTooltip'); if (tip.style.display==='block') positionTooltip(ev); });
+
+// Initialize with All
+filterSchedule('All');
+</script>
+</body>
+</html>

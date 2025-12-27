@@ -1,0 +1,201 @@
+<!--Garrett Safsten, Will Knudson, Willard Richards, and Logan Johnson
+This view contains the contact information for the Sewing Camp including email and phone details.-->
+<!-- NOTE: This page is primarily static contact information. No client-side scripts
+    are required here; styling matches other public pages for a consistent look. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Contact Us</title>
+<!-- Import Google Fonts for consistent typography -->
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* PAGE BACKGROUND */
+body {
+    background: linear-gradient(180deg,#fffefa 0%, #f6f9ff 100%);
+    font-family: 'Nunito', Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    color: #222;
+}
+
+/* NAVIGATION BAR - consistent with other pages */
+.navbar {
+    background: linear-gradient(135deg, #2a3d66 0%, #0b3d8a 100%);
+    padding: 0;
+    margin: 0 auto 20px;
+    border-radius: 10px;
+    box-shadow: 0 6px 20px rgba(42, 61, 102, 0.2);
+    max-width: 900px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.navbar-brand {
+    display: none;
+}
+
+.navbar-menu {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    flex-wrap: wrap;
+}
+
+.navbar-item {
+    position: relative;
+}
+
+.navbar-item a {
+    display: block;
+    padding: 18px 16px;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    transition: background-color 0.3s, color 0.3s;
+    border-bottom: 3px solid transparent;
+}
+
+.navbar-item a:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    border-bottom-color: #ff8fab;
+}
+
+.navbar-item a.active {
+    border-bottom-color: #ff8fab;
+    color: #ffb8c8;
+}
+
+.navbar-actions {
+    display: flex;
+    gap: 8px;
+    padding: 8px 15px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+/* BUTTONS */
+.btn-login {
+    background: linear-gradient(135deg, #ff8fab, #d6336c);
+    color: #fff;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: box-shadow 0.3s, transform 0.2s;
+}
+
+.btn-login:hover {
+    box-shadow: 0 6px 16px rgba(214, 51, 108, 0.35);
+    transform: translateY(-2px);
+}
+
+.btn-admin {
+    background: linear-gradient(135deg, #0b63ff, #0452d4);
+    color: #fff;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: box-shadow 0.3s, transform 0.2s;
+}
+
+.btn-admin:hover {
+    box-shadow: 0 6px 16px rgba(11, 99, 255, 0.35);
+    transform: translateY(-2px);
+}
+
+.btn-logout {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: #fff;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: box-shadow 0.3s, transform 0.2s;
+}
+
+.btn-logout:hover {
+    box-shadow: 0 6px 16px rgba(239, 68, 68, 0.35);
+    transform: translateY(-2px);
+}
+
+/* RESPONSIVE DESIGN - adjustments for smaller screens */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+    }
+    
+    .navbar-brand {
+        width: 100%;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .navbar-menu {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .navbar-item a {
+        padding: 12px 12px;
+        font-size: 13px;
+    }
+    
+    .navbar-actions {
+        width: 100%;
+        padding: 12px 15px;
+        justify-content: center;
+    }
+}
+
+/* Page Specific CSS */
+.container { max-width: 700px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 10px; }
+h2 { color: #d6336c; font-family: 'Fredoka', sans-serif; }
+.contact-info { margin-top: 20px; padding: 20px; background: #f9f9f9; border-radius: 8px; }
+img[alt="Sewing Made Simple for Kids Banner"]{display:block;margin:10px auto;max-width:552px;width:100%;height:auto}
+</style>
+</head>
+<body>
+<div style="max-width: 700px; margin: 0 auto 20px; text-align: center;"><img src="/images/SewingMadeSimpleForKidsBanner.png" style="max-width: 100%;" alt="Sewing Made Simple for Kids Banner"></div>
+
+<nav class="navbar" role="navigation" aria-label="Main">
+    <ul class="navbar-menu">
+        <li class="navbar-item"><a href="/">Home</a></li>
+        <li class="navbar-item"><a href="/campinfo">Camp Info</a></li>
+        <li class="navbar-item"><a href="/campschedule">Schedule</a></li>
+        <li class="navbar-item"><a href="/registrations">Registration</a></li>
+        <li class="navbar-item"><a href="/contactus">Contact</a></li>
+    </ul>
+    <div class="navbar-actions">
+        <% if (user) { %>
+            <a href="/admin" class="btn-admin">Admin</a>
+            <a href="/logout" class="btn-logout">Logout</a>
+        <% } else { %>
+            <a href="/login" class="btn-login">Login</a>
+        <% } %>
+    </div>
+</nav>
+
+<div class="container">
+    <h2>Contact Us</h2>
+    <p>If you have any questions, please don't hesitate to contact me through email or phone.</p>
+    <div class="contact-info">
+        <p><strong>Email:</strong> jensafsten@gmail.com</p>
+        <p><strong>Phone:</strong> (301)-514-3887</p>
+    </div>
+</div>
+</body>
+</html>

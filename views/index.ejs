@@ -1,0 +1,521 @@
+<!--Garrett Safsten, Will Knudson, Willard Richards, and Logan Johnson
+This view contains the home page for the Sewing Camp with pictures of examples of beginning projects and returning sewer projects.-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Home - Sewing Camp</title>
+
+<!-- Import custom fonts from Google Fonts for the page design -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+/* PAGE BACKGROUND AND LAYOUT */
+body {
+    background: linear-gradient(180deg,#fffefa 0%, #f6f9ff 100%);
+    font-family: 'Nunito', Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    color: #222;
+}
+
+/* NAVIGATION BAR STYLING - blue gradient bar with white text navigation links */
+.navbar {
+    background: linear-gradient(135deg, #2a3d66 0%, #0b3d8a 100%);
+    padding: 0;
+    margin: 0 auto 20px;
+    border-radius: 10px;
+    box-shadow: 0 6px 20px rgba(42, 61, 102, 0.2);
+    max-width: 900px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.navbar-brand {
+    display: none;
+}
+
+/* Menu items in navigation bar */
+.navbar-menu {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    flex-wrap: wrap;
+}
+
+.navbar-item {
+    position: relative;
+}
+
+/* Navigation links styling - white text with hover and active states */
+.navbar-item a {
+    display: block;
+    padding: 18px 16px;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    transition: background-color 0.3s, color 0.3s;
+    border-bottom: 3px solid transparent;
+}
+
+/* Hover effect for nav items - highlight bottom border */
+.navbar-item a:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    border-bottom-color: #ff8fab;
+}
+
+/* Active page indicator */
+.navbar-item a.active {
+    border-bottom-color: #ff8fab;
+    color: #ffb8c8;
+}
+
+/* Authentication buttons (Login/Admin/Logout) area */
+.navbar-actions {
+    display: flex;
+    gap: 8px;
+    padding: 8px 15px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+/* Login button styling - pink gradient */
+.btn-login {
+    background: linear-gradient(135deg, #ff8fab, #d6336c);
+    color: #fff;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: box-shadow 0.3s, transform 0.2s;
+}
+
+.btn-login:hover {
+    box-shadow: 0 6px 16px rgba(214, 51, 108, 0.35);
+    transform: translateY(-2px);
+}
+
+/* Admin button styling - blue gradient */
+.btn-admin {
+    background: linear-gradient(135deg, #0b63ff, #0452d4);
+    color: #fff;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: box-shadow 0.3s, transform 0.2s;
+}
+
+.btn-admin:hover {
+    box-shadow: 0 6px 16px rgba(11, 99, 255, 0.35);
+    transform: translateY(-2px);
+}
+
+/* Logout button styling - red gradient */
+.btn-logout {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: #fff;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: box-shadow 0.3s, transform 0.2s;
+}
+
+.btn-logout:hover {
+    box-shadow: 0 6px 16px rgba(239, 68, 68, 0.35);
+    transform: translateY(-2px);
+}
+
+/* RESPONSIVE DESIGN - mobile and tablet adjustments */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+    }
+    
+    .navbar-brand {
+        width: 100%;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .navbar-menu {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .navbar-item a {
+        padding: 12px 12px;
+        font-size: 13px;
+    }
+    
+    .navbar-actions {
+        width: 100%;
+        padding: 12px 15px;
+        justify-content: center;
+    }
+}
+
+/* PROJECT GALLERY GRID - displays all project examples in a table layout */
+.project-gallery {
+    width:100%;
+    max-width:1000px;
+    border-collapse: separate;
+    border-spacing:18px;
+}
+
+/* Individual project cards with hover effect for interactivity */
+.project-gallery td {
+    background:#fff;
+    border-radius:12px;
+    padding:14px;
+    text-align:center;
+    vertical-align:top;
+    box-shadow:0 6px 18px rgba(11,63,136,0.04);
+    transition:transform .18s, box-shadow .18s;
+}
+
+/* Lift project cards on hover */
+.project-gallery td:hover {
+    transform:translateY(-6px);
+    box-shadow:0 14px 30px rgba(11,63,136,0.08);
+}
+
+/* Project images in gallery cards */
+.project-gallery img {
+    max-width:100%;
+    height:auto;
+    border-radius:8px;
+    margin-bottom:10px;
+}
+
+/* SECTION HEADERS - purple category titles like "First Summer Sewer Projects" */
+.section-header {
+    background-color: #a18cd1 !important;
+    color: white !important;
+    font-family: 'Fredoka', sans-serif;
+    font-size: 26px;
+    padding: 15px 0;
+    border: none !important;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(161, 140, 209, 0.4);
+    width: auto !important; 
+    border-spacing: 0;
+}
+
+/* Remove hover effect from section headers */
+.project-gallery td.section-header:hover {
+    transform: none;
+    cursor: default;
+}
+
+/* UTILITY STYLES - cleanup and centering */
+/* Remove styling from empty cells */
+.project-gallery td:empty {
+    border: none;
+    background: transparent;
+    box-shadow: none;
+}
+
+/* Center the main layout table and banner */
+table[width="700"] {
+    margin:0 auto;
+}
+
+img[alt="Sewing Made Simple for Kids Banner"] {
+    display:block;
+    margin:12px auto;
+    max-width:552px;
+    width:100%;
+    height:auto;
+}
+
+/* Center the project gallery */
+.project-gallery {
+    margin:0 auto;
+}
+</style>
+
+</head>
+<body>
+
+<!-- BANNER SECTION - display camp logo/title -->
+<table border="0" cellspacing="0" cellpadding="0" width="700">
+<tr>
+<td colspan="16"><img src="/images/SewingMadeSimpleForKidsBanner.png" width="552" height="100" alt="Sewing Made Simple for Kids Banner"></td>
+<td rowspan="2" colspan="4"></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="16"></td>
+<td></td>
+</tr>
+
+<tr>
+<td colspan="18"></td>
+<td></td>
+</tr>
+</table>
+
+<!-- MAIN NAVIGATION BAR -->
+<nav class="navbar" role="navigation" aria-label="Main">
+    <ul class="navbar-menu">
+        <li class="navbar-item"><a href="/">Home</a></li>
+        <li class="navbar-item"><a href="/campinfo">Camp Info</a></li>
+        <li class="navbar-item"><a href="/campschedule">Schedule</a></li>
+        <li class="navbar-item"><a href="/registrations">Registration</a></li>
+        <li class="navbar-item"><a href="/contactus">Contact</a></li>
+    </ul>
+    <!-- Authentication section - shows different buttons based on login status -->
+    <div class="navbar-actions">
+        <% if (user) { %>
+            <a href="/admin" class="btn-admin">Admin</a>
+            <a href="/logout" class="btn-logout">Logout</a>
+        <% } else { %>
+            <a href="/login" class="btn-login">Login</a>
+        <% } %>
+    </div>
+</nav>
+
+<!-- PROJECT GALLERY - shows examples of beginner and advanced projects -->
+<table class="project-gallery">
+<!-- SECTION 1: First Summer Sewer Projects - for new/beginner sewers -->
+<tr>
+    <td colspan="4" class="section-header">First Summer Sewer Projects</td>
+</tr>
+<!-- Row showing 4 beginner projects for days 1-5 of camp -->
+<tr>
+    <td><img src="/images/Pillowcase.gif" alt="Pillow Case"><br>r<br>Pillow Case <br>(Day 1)</td>
+    <td><img src="/images/Patchwork Pillow.jpg" alt="Patchwork Pillow"><br><br>Patchwork Pillow <br>(Day 2)</td>
+    <td><img src="/images/Beach bag.gif" alt="Beach Bag"><br><img src="/images/Simple Purse.gif" alt="Simple Purse"><br><br>Pillow Case OR Simple Purse <br>(Day 3)</td>
+    <td><img src="/images/PJ Pants.gif" alt="PJ Pants"><br><img src="/images/Capris.gif" alt="Capris"><br><br>PJ Pants OR Capris <br>(Day 4 & 5)</td>
+</tr>
+
+<!-- SECTION 2: Returning Sewer Summer Projects - for experienced sewers -->
+<tr>
+    <td colspan="4" class="section-header">Returning Sewer Summer Projects</td>
+</tr>
+
+<!-- Row 1: Bags and purses -->
+<tr>
+    <td><img src="/images/Favorite Team Bag.gif" alt="Favorite Team Bag"><br><br>Favorite Team Bag</td>
+    <td><img src="/images/Sports Bag.jpg" alt="Sports Bag"><br><br>Sports Bag</td>
+    <td><img src="/images/SleepOver Bag.gif" alt="Sleep Over Bag"><br><br>Sleep Over Bag</td>
+    <td><img src="/images/Beach bag.gif" alt="Beach Bag"><br><br>Pillow Case <br>(Day One)</td>
+</tr>
+
+<!-- Row 2: More bags and purses -->
+<tr>
+    <td><img src="/images/Sling Bag.gif" alt="Sling Bag"><br><br>Sling Bag</td>
+    <td><img src="/images/Ella's Purse.gif" alt="Ella's Purse"><br><br>Ella's Purse</td>
+    <td><img src="/images/Simple Purse.gif" alt="Simple Purse"><br><br>Simple Purse</td>
+    <td><img src="/images/Two Tone Tote Bag.jpg" alt="Two Tone Tote Bag"><br><br>Two Tone Tote Bag</td>
+</tr>
+
+<!-- Row 3: Advanced bags -->
+<tr>
+    <td><img src="/images/Owl Purse.jpg" alt="Owl Purse"><br><br>Owl Purse</td>
+    <td><img src="/images/Crossover Purse.gif" alt="Crossover Purse"><br><br>Crossover Purse</td>
+    <td><img src="/images/Duffle Bag.jpg" alt="Duffle Bag"><br><br>Duffle Bag</td>
+    <td><img src="/images/Zipper Pouch.jpg" alt=""><br><br>Zipper Pouch<br>(You will make one) </td>
+</tr>
+
+<!-- Row 4: Backpacks -->
+<tr>
+    <td><img src="/images/Cinch Backpack.jpg" alt="Cinch Backpack"><br><br>Cinch Backpack</td>
+    <td><img src="/images/Library Bag.png" alt="Library Bag"><br><br>Library Bag</td>
+    <td><img src="/images/Vera Bradley Bag.jpg" alt="Vera Bradley Bag"><br><br>Vera Bradley Bag</td>
+    <td><img src="/images/Quilted Charm Bag.png" alt="Quilted Charm Bag"><br><br>Quilted Charm Bag</td>
+</tr>
+
+<!-- Row 5: More bags and accessories -->
+<tr>
+    <td><img src="/images/Large Zipper Bag.png" alt="Large Zipper Bag"><br><br>Large Zipper Bag</td>
+    <td><img src="/images/Drawstring Backpack.gif" alt="Drawstring Backpack"><br><br>Drawstring Backpack</td>
+    <td><img src="/images/Chloe's Purse.png" alt="Chloe's Purse"><br><br>Chloe's Purse</td>
+    <td><img src="/images/Flat Bottom Zipper Bag.jpg" alt="Flat Bottom Zipper Bag"><br><br>Flat Bottom Zipper Bag</td>
+</tr>
+
+<!-- Row 6: Specialty bags -->
+<tr>
+    <td><img src="/images/Confetti Vinyl Bag.jpg" alt="Confetti Vinyl Bag"><br><br>Confetti Vinyl Bag</td>
+    <td><img src="/images/Cross Body Bag.png" alt="Cross Body Bag"><br><br>Cross Body Bag</td>
+    <td><img src="/images/Easy Zipper Purse.jpg" alt="Easy Zipper Purse"><br><br>Easy Zipper Purse</td>
+    <td><img src="/images/Beach Towel Pants for Swimmers.jpg" alt="Beach Towel Pants for Swimmers"><br><br>Beach Towel Pants for Swimmers</td>
+</tr>
+
+<!-- Row 7: Clothing - skirts -->
+<tr>
+    <td><img src="/images/Jr Misses Ditsy Skirt.png" alt="Jr Misses Ditsy Skirt"><br><br>Jr Misses Ditsy Skirt</td>
+    <td><img src="/images/Sweatshirt and Shorts.jpg" alt="Sweatshirt and Shorts"><br><br>Sweatshirt and Shorts <br>Sizes 8, 10, 12</td>
+    <td><img src="/images/Misses Summer Skirts.jpg" alt="Misses Summer Skirts"><br><br>Misses Summer Skirts</td>
+    <td><img src="/images/PJ Shorts.png" alt="PJ Shorts"><br><br>PJ Shorts</td>
+</tr>
+
+<!-- Row 8: Clothing - bottoms -->
+<tr>
+    <td><img src="/images/PJ Capris.gif" alt="PJ Capris"><br><br>PJ Capris</td>
+    <td><img src="/images/PJ Long Pants.gif" alt="PJ Long Pants"><br><br>PJ Long Pants</td>
+    <td><img src="/images/Children's Girls Top With Sleeves.jpg" alt="Children's Girls Top With Sleeves"><br><br>Children's Girls Top With Sleeves <br>(Lace or Solid)</td>
+    <td><img src="/images/Jr Misses Pocket Skirt.gif" alt="Jr/Misses Pocket Skirt"><br><br>Jr/Misses Pocket Skirt</td>
+</tr>
+
+<!-- Row 9: More clothing options -->
+<tr>
+    <td><img src="/images/Modern Elastic Skirt.gif" alt="Modern Elastic Skirt"><br><br>Modern Elastic Skirt</td>
+    <td><img src="/images/Straight Skirt.gif" alt="Straight Skirt"><br><br>Straight Skirt</td>
+    <td><img src="/images/Fleece Robes.jpg" alt="Fleece Robes"><br><br>Fleece Robes</td>
+    <td><img src="/images/Capri Joggers.jpg" alt="Capri Joggers"><br><br>Capri Joggers <br> (Junior and Misses)</td>
+</tr>
+
+<!-- Row 10: Children's clothing -->
+<tr>
+    <td><img src="/images/Childrens Joggers.png" alt="Childrens Joggers"><br><br>Childrens Joggers <br>(Sizes 9-14)</td>
+    <td><img src="/images/Fleece Zip Up Onesie.gif" alt="Fleece Zip Up Onesie"><br><br>Fleece Zip Up Onesie <br>(Childrens, Juniors, and Womens)</td>
+    <td><img src="/images/Girls and Juniors Skirts.jpg" alt="Girls and Juniors Skirts"><br><br>Girls and Juniors Skirts <br>Waistband in front, elastic in the back</td>
+    <td><img src="/images/Children's Summer Top.jpg" alt="Children's Summer Top"><br><br>Children's Summer Top <br>(Sizes 8-14)</td>
+</tr>
+
+<!-- Row 11: Lounge wear and skirts -->
+<tr>
+    <td><img src="/images/Children Adult Lounge Pants.jpg" alt="Children Adult Lounge Pants"><br><br>Children Adult Lounge Pants</td>
+    <td><img src="/images/Children's Maxi Skirt.jpg" alt="Children's Maxi Skirt"><br><br>Children's Maxi Skirt</td>
+    <td><img src="/images/Jr Misses Long Maxi Skirt.gif" alt="Jr Misses Long Maxi Skirt"><br><br>Jr/Misses Long Maxi Skirt</td>
+    <td><img src="/images/Fleece Sweatshirt.gif" alt="Fleece Sweathshirt"><br><br>Fleece Sweatshirt</td>
+</tr>
+
+<!-- Row 12: Fleece outerwear -->
+<tr>
+    <td><img src="/images/Fleece Jacket with Zipper.png" alt="Fleece Jacket with Zipper"><br><br>Fleece Jacket with Zipper</td>
+    <td><img src="/images/Beach or Flowerpot Table Runner.png" alt="Beach or Flowerpot Table Runner"><br><br>Beach or Flowerpot Table Runner</td>
+    <td><img src="/images/Water Bottle Holder.jpg" alt="Water Bottle Holder"><br><br>Water Bottle Holder</td>
+    <td><img src="/images/Ferdinand the Frog.jpg" alt="Ferdinand the Frog"><br><br>Ferdinand the Frog</td>
+</tr>
+
+<!-- Row 13: Plushies - frogs and marine animals -->
+<tr>
+    <td><img src="/images/Wendy the Whale.gif" alt="Wendy the Whale"><br><br>Wendy the Whale <br>(14")</td>
+    <td><img src="/images/Sloth.jpg" alt="Sloth"><br><br>Sloth <br>(15")</td>
+    <td><img src="/images/Wallace the Whale.jpg" alt="Wallace the Whale"><br><br>Wallace the Whale <br>(24")</td>
+    <td><img src="/images/Koala Bear.jpg" alt="Koala Bear"><br><br>Koala Bear <br> (15")</td>
+</tr>
+
+<!-- Row 14: Plushies - bears and llama -->
+<tr>
+    <td><img src="/images/Panda Bear.jpg" alt="Panda Bear"><br><br> Panda Bear <br>(15")</td>
+    <td><img src="/images/Llama.gif" alt="Llama"><br><br>Llama</td>
+    <td><img src="/images/Baby Yoda.jpg" alt="Baby Yoda"><br><br>Baby Yoda</td>
+    <td><img src="/images/Casey the Crab.jpg" alt="Casey the Crab"><br><br>Casey the Crab</td>
+</tr>
+
+<!-- Row 15: Plushies - dogs and creatures -->
+<tr>
+    <td><img src="/images/Dachshund Dave.jpg" alt="Dachshund Dave"><br><br>Dachshund Dave</td>
+    <td><img src="/images/Fleece Dolphin.gif" alt="Fleece Dolphin"><br><br>Fleece Dolphin</td>
+    <td><img src="/images/Dinosaur.gif" alt="Dinosaur"><br><br>Dinosaur</td>
+    <td><img src="/images/Name Pillow.jpg" alt="Name Pillow"><br><br>Name Pillow</td>
+</tr>
+
+<!-- Row 16: More plushies -->
+<tr>
+    <td><img src="/images/Shoulder Dragon.jpg" alt="Shoulder Dragon"><br><br>Shoulder Dragon</td>
+    <td><img src="/images/Hugging Stuffed Fleece Animals.gif" alt="Hugging Stuffed Fleece Animals"><br><br>Hugging Stuffed Fleece Animals <br>(Overstuffed 20" tall)</td>
+    <td><img src="/images/Chunky Puppy.gif" alt="Chunky Puppy"><br><br>Chunky Puppy</td>
+    <td><img src="/images/Fleece Pug.jpg" alt="Fleece Pug"><br><br>Fleece Pug</td>
+</tr>
+
+<!-- Row 17: Cats and scooter bags -->
+<tr>
+    <td><img src="/images/Stuffed Cat.jpg" alt="Stuffed Cat"><br><br>Stuffed Cat</td>
+    <td><img src="/images/Scooter Buddy Bag.jpg" alt="Scooter Buddy Bag"><br><br>Scooter Buddy Bag</td>
+    <td><img src="/images/Fleece Puppy.jpg" alt="Fleece Puppy"><br><br>Fleece Puppy</td>
+    <td><img src="/images/Standing Dog.jpg" alt="Standing Dog"><br><br>Standing Dog</td>
+</tr>
+
+<!-- Row 18: Gnomes and pillows -->
+<tr>
+    <td><img src="/images/Patriotic Gnome.gif" alt="Patriotic Gnome"><br><br>Patriotic Gnome</td>
+    <td><img src="/images/Unicorn Pillow.jpg" alt="Unicorn Pillow"><br><br>Unicorn Pillow</td>
+    <td><img src="/images/Puffy Penguin.gif" alt="Puffy Penguin"><br><br>Puffy Penguin (12") <br> (Sew One)</td>
+    <td><img src="/images/Narwhal.jpg" alt="Narwhal"><br><br>Narwhal</td>
+</tr>
+
+<!-- Row 19: More pillows and bags -->
+<tr>
+    <td><img src="/images/Crocodile Pillow.jpg" alt="Crocodile Pillow"><br><br>Crocodile Pillow</td>
+    <td><img src="/images/Flip Flop Pillow.jpg" alt="Flip Flop Pillow"><br><br>Flip Flop Pillow (You will sew one)</td>
+    <td><img src="/images/Reading Pillow.jpg" alt="Reading Pillow"><br><br>Reading Pillow</td>
+    <td><img src="/images/Bike Handlebar Bag.jpg" alt="Bike Handlebar Bag"><br><br>Bike Handlebar Bag</td>
+</tr>
+
+<!-- Row 20: Beach and kangaroo items -->
+<tr>
+    <td><img src="/images/Beach Towel Backpack.png" alt="Beach Towel Backpack"><br><br>Beach Towel Backpack</td>
+    <td><img src="/images/Kangaroo.png" alt="Kangaroo"><br><br>Kangaroo</td>
+    <td><img src="/images/Hanging Room Organizer.png" alt="Hanging Room Organizer"><br><br>Hanging Room Organizer</td>
+    <td><img src="/images/Square Patchwork Pillow.jpg" alt="Square Patchwork Pillow"><br><br>Square Patchwork Pillow</td>
+</tr>
+
+<!-- Row 21: Home decor items -->
+<tr>
+    <td><img src="/images/Flower Fleece Pillow.gif" alt="Flower Fleece Pillow"><br><br>Flower Fleece Pillow</td>
+    <td><img src="/images/Beginner Quilt.jpg" alt="Beginner Quilt"><br><br>Beginner Quilt</td>
+    <td><img src="/images/Bedside Organizer.gif" alt="Bedside Organizer"><br><br>Bedside Organizer</td>
+    <td><img src="/images/Doll Sleeping Bag.jpg" alt="Doll Sleeping Bag"><br><br>Doll Sleeping Bag</td>
+</tr>
+
+<!-- Row 22: Beach items and quilts -->
+<tr>
+    <td><img src="/images/More Than a Beach Towel.png" alt="More Than a Beach Towel"><br><br>More Than a Beach Towel</td>
+    <td><img src="/images/Taco.jpg" alt="Taco"><br><br>Taco (13"x19")</td>
+    <td><img src="/images/Stripped Lounge Quilt.gif" alt="Stripped Lounge Quilt"><br><br>Stripped Lounge Quilt</td>
+    <td><img src="/images/Poseable Dogs.jpg" alt="Poseable Dogs"><br><br>Poseable Dogs</td>
+</tr>
+
+<!-- Row 23: Table runners and doll items -->
+<tr>
+    <td><img src="/images/Patriotic Table Runner.gif" alt="Patriotic Table Runner"><br><br>Patriotic Table Runner</td>
+    <td><img src="/images/American Girl Doll Blanket and Pillow.jpg" alt="American Girl Doll Blanket and Pillow"><br><br>American Girl Doll Blanket and Pillow</td>
+    <td><img src="/images/Hobby Apron.png" alt="Hobby Apron"><br><br>Hobby Apron</td>
+    <td><img src="/images/Unicorn Dancer.jpg" alt="Unicorn Dancer"><br><br>Unicorn Dancer</td>
+</tr>
+
+<!-- Row 24: Cats and dragons -->
+<tr>
+    <td><img src="/images/Striped Cat.jpg" alt="Striped Cat"><br><br>Striped Cat</td>
+    <td><img src="/images/Stuffed Dragons.jpg" alt="Stuffed Dragons"><br><br>Stuffed Dragons</td>
+    <td><img src="/images/Fleece Cat.jpg" alt="Fleece Cat"><br><br>Fleece Cat</td>
+    <td><img src="/images/Beach Gnome.jpg" alt="Beach Gnome"><br><br>Beach Gnome</td>
+</tr>
+
+<!-- Row 25: Travel pillows -->
+<tr>
+    <td><img src="/images/Fleece Travel Pillow.png" alt="Fleece Travel Pillow"><br><br>Fleece Travel Pillow</td>
+    <td><img src="/images/Neck Pillow.jpg" alt="Neck Pillow"><br><br>Neck Pillow</td>
+    <td><img src="/images/Owl Neck Pillow.jpg" alt="Owl Neck Pillow"><br><br>Owl Neck Pillow</td>
+    <td><img src="/images/Penguin Neck Pillow.gif" alt="Penguin Neck Pillow"><br><br>Penguin Neck Pillow</td>
+</tr>
+
+<!-- Row 26: Various neck pillow options -->
+<tr>
+    <td><img src="/images/Various Neck Pillows.gif" alt="Various Neck Pillows"><br><br>Various Neck Pillows <br>(Choose 1)</td>
+</tr>
+</table>
+
+</body>
+</html>

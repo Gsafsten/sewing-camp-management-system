@@ -1,0 +1,436 @@
+<!--Garrett Safsten, Will Knudson, Willard Richards, and Logan Johnson
+This view contains the camp info.-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Camp Info - Sewing Camp</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+
+<!-- STYLE: Page layout, navigation, and component styling for Camp Info page.
+     The rules below set the global theme, navbar, and container visuals. -->
+
+<style>
+/* Unified theme: professional + fun */
+body {
+    background: linear-gradient(180deg,#fffefa 0%, #f6f9ff 100%);
+    font-family: 'Nunito', Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    color: #222;
+}
+
+/* Navigation Bar Styles */
+.navbar {
+    background: linear-gradient(135deg, #2a3d66 0%, #0b3d8a 100%);
+    padding: 0;
+    margin: 0 auto 20px;
+    border-radius: 10px;
+    box-shadow: 0 6px 20px rgba(42, 61, 102, 0.2);
+    max-width: 900px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.navbar-brand {
+    display: none;
+}
+
+.navbar-menu {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    flex-wrap: wrap;
+}
+
+.navbar-item {
+    position: relative;
+}
+
+.navbar-item a {
+    display: block;
+    padding: 18px 16px;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    transition: background-color 0.3s, color 0.3s;
+    border-bottom: 3px solid transparent;
+}
+
+.navbar-item a:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    border-bottom-color: #ff8fab;
+}
+
+.navbar-item a.active {
+    border-bottom-color: #ff8fab;
+    color: #ffb8c8;
+}
+
+.navbar-actions {
+    display: flex;
+    gap: 8px;
+    padding: 8px 15px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.btn-login {
+    background: linear-gradient(135deg, #ff8fab, #d6336c);
+    color: #fff;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: box-shadow 0.3s, transform 0.2s;
+}
+
+.btn-login:hover {
+    box-shadow: 0 6px 16px rgba(214, 51, 108, 0.35);
+    transform: translateY(-2px);
+}
+
+.btn-admin {
+    background: linear-gradient(135deg, #0b63ff, #0452d4);
+    color: #fff;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: box-shadow 0.3s, transform 0.2s;
+}
+
+.btn-admin:hover {
+    box-shadow: 0 6px 16px rgba(11, 99, 255, 0.35);
+    transform: translateY(-2px);
+}
+
+.btn-logout {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: #fff;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: box-shadow 0.3s, transform 0.2s;
+}
+
+.btn-logout:hover {
+    box-shadow: 0 6px 16px rgba(239, 68, 68, 0.35);
+    transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+    }
+    
+    .navbar-brand {
+        width: 100%;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .navbar-menu {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .navbar-item a {
+        padding: 12px 12px;
+        font-size: 13px;
+    }
+    
+    .navbar-actions {
+        width: 100%;
+        padding: 12px 15px;
+        justify-content: center;
+    }
+}
+
+/* --- UPDATED ACCORDION STYLES FOR A FUN, SOFTER LOOK --- */
+.accordion {max-width:920px;margin:18px auto 36px;padding:0 14px}
+
+.accordion-item {
+    background:#fff;
+    border-radius: 15px; /* More rounded */
+    margin: 15px 0; /* More spacing between items */
+    box-shadow: 0 4px 12px rgba(100, 100, 200, 0.08); /* Softer shadow */
+    border: 1px solid #eef2ff;
+    overflow:hidden;
+    transition: transform 0.2s ease;
+}
+
+.accordion-item:hover {
+    transform: translateY(-2px); /* Slight lift on hover */
+    box-shadow: 0 6px 16px rgba(100, 100, 200, 0.12);
+}
+
+.accordion-header {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding: 18px 24px;
+    cursor:pointer;
+    /* Fun, soft gradient background */
+    background: linear-gradient(135deg, #f0f4ff 0%, #e0e7ff 100%);
+    border-bottom: 1px solid transparent;
+    transition: all 0.3s ease;
+}
+
+/* Change header color when active */
+.accordion-item:has(.accordion-panel.open) .accordion-header {
+    background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+    border-bottom: 1px solid #c7d2fe;
+}
+
+.accordion-header button {
+    all:unset;
+    cursor:pointer;
+    font-family:'Fredoka', sans-serif;
+    color: #4338ca; /* Indigo-700 (Softer than pure blue) */
+    font-size: 19px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    flex-grow: 1;
+}
+
+.accordion-panel {
+    padding: 20px 24px;
+    color: #4b5563; /* Gray-600 */
+    line-height: 1.7;
+    font-size: 16px;
+    display:none;
+    background: #fff;
+}
+
+.accordion-panel.open {
+    display:block;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Fun Toggle Icon */
+.accordion-toggle-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #fff;
+    color: #6366f1; /* Indigo-500 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 18px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease, background-color 0.3s;
+}
+
+/* Rotate icon when open */
+.accordion-item:has(.accordion-panel.open) .accordion-toggle-icon {
+    transform: rotate(45deg);
+    background: #4338ca;
+    color: #fff;
+}
+
+/* List styling inside panels */
+.accordion-panel ul {
+    list-style-type: none;
+    padding-left: 10px;
+}
+
+.accordion-panel ul li {
+    margin-bottom: 8px;
+    position: relative;
+    padding-left: 25px;
+}
+
+.accordion-panel ul li::before {
+    content: '🧵'; /* Sewing emoji bullet! */
+    position: absolute;
+    left: 0;
+    font-size: 14px;
+    top: 2px;
+}
+
+.style13 {font-family:'Fredoka', sans-serif; font-weight:700; color:#d6336c; font-size:24px; text-align: center; margin-bottom: 30px;}
+table[width="700"]{margin:0 auto}
+img[alt="Sewing Made Simple for Kids Banner"]{display:block;margin:10px auto;max-width:552px;width:100%;height:auto}
+</style>
+
+<script>
+// Simple accordion: only one panel open at a time
+function initAccordion(selector){
+    const container = document.querySelector(selector);
+    if(!container) return;
+    container.querySelectorAll('.accordion-header').forEach(header=>{
+        header.addEventListener('click', ()=>{
+            const item = header.parentElement;
+            const panel = item.querySelector('.accordion-panel');
+            const isOpen = panel.classList.contains('open');
+            // close all
+            container.querySelectorAll('.accordion-panel').forEach(p=>p.classList.remove('open'));
+            // toggle clicked
+            if(!isOpen) panel.classList.add('open');
+        });
+    });
+}
+document.addEventListener('DOMContentLoaded', function(){ initAccordion('.accordion'); });
+</script>
+
+</head>
+<body>
+
+<table border="0" cellspacing="0" cellpadding="0" width="700">
+<tr>
+<td colspan="16"><img src="/images/SewingMadeSimpleForKidsBanner.png" width="552" height="100" alt="Sewing Made Simple for Kids Banner"></td>
+<td rowspan="2" colspan="4"></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="16"></td>
+<td></td>
+</tr>
+
+<tr>
+<td colspan="18"></td>
+<td></td>
+</tr>
+</table>
+
+<nav class="navbar" role="navigation" aria-label="Main">
+    <ul class="navbar-menu">
+        <li class="navbar-item"><a href="/">Home</a></li>
+        <li class="navbar-item"><a href="/campinfo">Camp Info</a></li>
+        <li class="navbar-item"><a href="/campschedule">Schedule</a></li>
+        <li class="navbar-item"><a href="/registrations">Registration</a></li>
+        <li class="navbar-item"><a href="/contactus">Contact</a></li>
+    </ul>
+    <div class="navbar-actions">
+        <% if (user) { %>
+            <a href="/admin" class="btn-admin">Admin</a>
+            <a href="/logout" class="btn-logout">Logout</a>
+        <% } else { %>
+            <a href="/login" class="btn-login">Login</a>
+        <% } %>
+    </div>
+</nav>
+
+<table border="0" cellspacing="0" cellpadding="0" width="700">
+    <tr>
+        <td bgcolor="#ffffff" valign="top" colspan="18" style="padding: 25px;">
+            <p class="style13">Camp Information</p>
+
+            <div class="accordion" role="tablist" aria-label="Camp FAQs">
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <button type="button">What will the children learn during their week at camp?</button>
+                        <div class="accordion-toggle-icon">+</div>
+                    </div>
+                    <div class="accordion-panel">
+                        <p>During this week of camp, your child will learn the following:</p>
+                        <ul>
+                            <li>How To Use A Sewing Machine</li>
+                            <li>Sewing Safety</li>
+                            <li>How To Pin</li>
+                            <li>How To Cut</li>
+                            <li>How To Straight Stitch</li>
+                            <li>How To Zig Zag Stitch</li>
+                            <li>Fabric</li>
+                            <li>Patterns</li>
+                            <li>Measuring Techniques</li>
+                            <li>Basic Stitches By Hand</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <button type="button">What projects will your child work on during their week at camp?</button>
+                        <div class="accordion-toggle-icon">+</div>
+                    </div>
+                    <div class="accordion-panel">
+                        <p>Your child will work on and make four different projects during the week.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <button type="button">How many campers are in each session?</button>
+                        <div class="accordion-toggle-icon">+</div>
+                    </div>
+                    <div class="accordion-panel">
+                        <p>Because 1 on 1 interaction works most effectively with this type of skill development, camp sessions are limited to 7-8 students per session.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <button type="button">What days of the week and at what times will the camp sessions be held?</button>
+                        <div class="accordion-toggle-icon">+</div>
+                    </div>
+                    <div class="accordion-panel">
+                        <p>Each camp session will be held for one week: Monday - Friday.</p>
+                        <p>Time of each day's session: 9:30-11:30 AM or 1:00 PM - 3:00 PM depending on the week you choose to attend.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <button type="button">What equipment and supplies will your child need to participate?</button>
+                        <div class="accordion-toggle-icon">+</div>
+                    </div>
+                    <div class="accordion-panel">
+                        <p>All equipment, sewing tools and patterns are provided for your child.</p>
+                        <p>A list of supplies and materials for each project will be provided upon registration. Your child will need to supply material, thread, and other notions for each project. You don't need to spend much; check your fabric stash or ask relatives.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <button type="button">How much does the camp cost?</button>
+                        <div class="accordion-toggle-icon">+</div>
+                    </div>
+                    <div class="accordion-panel">
+                        <p>The cost of the camp is $125 for a full week.</p>
+                        <p>4th of July week of camp is 4 days: $100.</p>
+                        <p>If you sign up before May 10, 2024, discounted pricing applies: $115 (full week) or $90 (4th of July week).</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <button type="button">Where is the camp located?</button>
+                        <div class="accordion-toggle-icon">+</div>
+                    </div>
+                    <div class="accordion-panel">
+                        <p>The instructor's home is located in Mount Airy behind Sam Hill Estates (Harvest Ridge community) across from the Rattlewood Golf Course on Penn Shop Rd.</p>
+                        <p>Directions to the camp location will be given after registration has been confirmed.</p>
+                    </div>
+                </div>
+            </div>
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>

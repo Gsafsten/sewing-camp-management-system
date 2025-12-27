@@ -1,0 +1,269 @@
+<!--Garrett Safsten, Will Knudson, Willard Richards, and Logan Johnson
+This view contain the registration information for participants.-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Registrations - Sewing Camp</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+
+<!-- STYLE: Registration information page styling (navbar, content container, and typography) -->
+
+<style>
+/* Unified theme: professional + fun */
+body {
+    background: linear-gradient(180deg,#fffefa 0%, #f6f9ff 100%);
+    font-family: 'Nunito', Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    color: #222;
+}
+
+/* Navigation Bar Styles */
+.navbar {
+    background: linear-gradient(135deg, #2a3d66 0%, #0b3d8a 100%);
+    padding: 0;
+    margin: 0 auto 20px;
+    border-radius: 10px;
+    box-shadow: 0 6px 20px rgba(42, 61, 102, 0.2);
+    max-width: 900px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.navbar-brand {
+    display: none;
+}
+
+.navbar-menu {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    flex-wrap: wrap;
+}
+
+.navbar-item {
+    position: relative;
+}
+
+.navbar-item a {
+    display: block;
+    padding: 18px 16px;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    transition: background-color 0.3s, color 0.3s;
+    border-bottom: 3px solid transparent;
+}
+
+.navbar-item a:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    border-bottom-color: #ff8fab;
+}
+
+.navbar-item a.active {
+    border-bottom-color: #ff8fab;
+    color: #ffb8c8;
+}
+
+.navbar-actions {
+    display: flex;
+    gap: 8px;
+    padding: 8px 15px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.btn-login {
+    background: linear-gradient(135deg, #ff8fab, #d6336c);
+    color: #fff;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: box-shadow 0.3s, transform 0.2s;
+}
+
+.btn-login:hover {
+    box-shadow: 0 6px 16px rgba(214, 51, 108, 0.35);
+    transform: translateY(-2px);
+}
+
+.btn-admin {
+    background: linear-gradient(135deg, #0b63ff, #0452d4);
+    color: #fff;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: box-shadow 0.3s, transform 0.2s;
+}
+
+.btn-admin:hover {
+    box-shadow: 0 6px 16px rgba(11, 99, 255, 0.35);
+    transform: translateY(-2px);
+}
+
+.btn-logout {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: #fff;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: box-shadow 0.3s, transform 0.2s;
+}
+
+.btn-logout:hover {
+    box-shadow: 0 6px 16px rgba(239, 68, 68, 0.35);
+    transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+    }
+    
+    .navbar-brand {
+        width: 100%;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .navbar-menu {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .navbar-item a {
+        padding: 12px 12px;
+        font-size: 13px;
+    }
+    
+    .navbar-actions {
+        width: 100%;
+        padding: 12px 15px;
+        justify-content: center;
+    }
+}
+.style13 {font-family: 'Lucida Handwriting', 'Comic Sans MS', Arial, sans-serif; font-weight: 700; color: #d6336c; font-style: normal; font-size: 20px;}
+table[width="700"] {padding: 25px; margin:0 auto}
+.content {padding: 20px 30px; line-height: 1.6;}
+.content h2 {color: #2a3d66; margin-top: 20px; margin-bottom: 10px;}
+.content p {color: #333; margin-bottom: 12px;}
+.content ol { margin-left: 20px; margin-bottom: 15px; padding-left: 20px;}
+.content ul {margin-left: 20px; margin-bottom: 15px; padding-left: 20px;}
+.content li {margin-bottom: 8px; color: #333;}
+.highlight {color: #d6336c; font-weight: bold;}
+.btn-register {display: inline-block; background: linear-gradient(180deg, #ff8fab, #d6336c); color: #fff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; margin-top: 15px; box-shadow: 0 6px 14px rgba(214,51,108,0.24);}
+.btn-register:hover {filter: brightness(0.98); transform: translateY(-1px);}
+
+@media (max-width:700px){
+    table[width="700"] {margin:8px}
+    .content {padding: 15px 20px;}
+}
+img[alt="Sewing Made Simple for Kids Banner"]{display:block;margin:10px auto;max-width:552px;width:100%;height:auto}
+</style>
+
+</head>
+<body>
+
+<table border="0" cellspacing="0" cellpadding="0" width="700">
+<tr>
+<td colspan="16"><img src="/images/SewingMadeSimpleForKidsBanner.png" width="552" height="100" alt="Sewing Made Simple for Kids Banner"></td>
+<td rowspan="2" colspan="4"></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="16"></td>
+<td></td>
+</tr>
+
+<tr>
+<td colspan="18"></td>
+<td></td>
+</tr>
+</table>
+
+<!-- NAVIGATION: consistent top navigation used across all public pages -->
+<nav class="navbar" role="navigation" aria-label="Main">
+    <ul class="navbar-menu">
+        <li class="navbar-item"><a href="/">Home</a></li>
+        <li class="navbar-item"><a href="/campinfo">Camp Info</a></li>
+        <li class="navbar-item"><a href="/campschedule">Schedule</a></li>
+        <li class="navbar-item"><a href="/registrations">Registration</a></li>
+        <li class="navbar-item"><a href="/contactus">Contact</a></li>
+    </ul>
+    <div class="navbar-actions">
+        <% if (user) { %>
+            <a href="/admin" class="btn-admin">Admin</a>
+            <a href="/logout" class="btn-logout">Logout</a>
+        <% } else { %>
+            <a href="/login" class="btn-login">Login</a>
+        <% } %>
+    </div>
+</nav>
+
+<table border="0" cellspacing="0" cellpadding="0" width="700">
+    <tr>
+        <td bgcolor="#ffffff" valign="top" colspan="18">
+            <!-- CONTENT: Public-facing registration information, steps, payment and refund policy -->
+            <div class="content">
+                <p class="style13">Registration</p>
+
+                <p><span class="highlight">Don't wait long to register, spots are filling up fast!</span></p>
+
+                <p>We have a registration process that we follow to ensure a spot for your child:</p>
+
+                <h2>Registration Steps:</h2>
+                <ol>
+                    <li><strong>Choose your preferred week(s)</strong> (you may want to choose a 1st and 2nd choice)</li>
+                    <li><strong>Email me</strong> (BEFORE sending in your registration and check) so I can pencil you in for that week.</li>
+                    <li><strong>Fill out the online registration form</strong> here: <a href="/register" class="highlight">ONLINE REGISTRATION</a></li>
+                </ol>
+
+                <h2>Payment ($125)</h2>
+                <p>Payment ($125) can be made through one of the following methods:</p>
+                <ul>
+                    <li><strong>Venmo:</strong> @Csaf16 (please don't send as a business payment, I am charged a fee)</li>
+                    <li><strong>Check:</strong> Send your check payable to Jennifer Safsten to the following address:
+                        <div style="margin-left: 20px; margin-top: 8px; font-style: italic;">
+                            Jennifer Safsten<br>
+                            13485 Four Seasons Ct<br>
+                            Mt. Airy, MD 21771
+                        </div>
+                    </li>
+                </ul>
+
+                <p>Once your payment is received, this will guarantee your spot for that week.</p>
+
+                <p><strong>Note:</strong> Payments MUST be received within 1 week of reserving a spot (unless other arrangements are made). If not received within one week, the spot will become available to other participants.</p>
+
+                <h2>Refund Policy</h2>
+                <p>There are NO refunds, deductions, or credits granted for any missed class or camp. However, we offer a generous make-up policy. Make-up classes are available for any class missed due to illness.</p>
+
+                <p style="text-align: center;">
+                    <a href="/register" class="btn-register">Fill Out Registration Form</a>
+                </p>
+            </div>
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!--Garrett Safsten, Will Knudson, Willard Richards, and Logan Johnson
+This view contains the login page for staff to access the admin dashboard.-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Login</title>
+<!-- Import Google Fonts for consistent typography -->
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* PAGE LAYOUT AND STYLING */
+body{background:linear-gradient(180deg,#fffefa 0%, #f6f9ff 100%);font-family:'Nunito', Arial, sans-serif;margin:0;padding:22px;color:#222}
+table[width="700"]{margin:0 auto}
+img[alt="Sewing Made Simple for Kids Banner"]{display:block;margin:10px auto;max-width:552px;width:100%;height:auto}
+
+/* NAVIGATION BAR - consistent with other pages */
+.navbar{background:linear-gradient(135deg,#2a3d66 0%, #0b3d8a 100%); padding:0; margin:0 auto 20px; border-radius:10px; max-width:920px; display:flex; align-items:center; justify-content:center; flex-wrap:wrap}
+.navbar-menu{display:flex; list-style:none; margin:0; padding:0}
+.navbar-item a{display:block; padding:14px 14px; color:#fff; text-decoration:none; font-weight:700}
+.navbar-actions{display:flex; gap:8px; padding:8px 16px; margin-left:auto}
+
+/* LOGIN FORM CONTAINER */
+.container{max-width:420px; margin:40px auto; background:#fff; padding:26px; border-radius:10px; box-shadow:0 10px 30px rgba(11,63,136,0.06)}
+h2{text-align:center;color:#d6336c;font-family:'Fredoka', sans-serif}
+
+/* LOGIN FORM INPUTS */
+input{width:100%;padding:12px;margin-bottom:14px;border:1px solid #e6e9ef;border-radius:8px}
+
+/* LOGIN SUBMIT BUTTON */
+.btn-submit{width:100%;padding:12px;background:linear-gradient(135deg,#ff8fab,#d6336c);color:#fff;border:none;border-radius:8px;font-weight:800; cursor: pointer;}
+
+/* ERROR MESSAGE DISPLAY */
+.error{color:#ef4444;text-align:center;margin-bottom:12px}
+</style>
+</head>
+<body>
+<!-- BANNER AT TOP OF PAGE -->
+<div style="max-width: 700px; margin: 0 auto 20px; text-align: center;"><img src="/images/SewingMadeSimpleForKidsBanner.png" style="max-width: 100%;" alt="Sewing Made Simple for Kids Banner"></div>
+
+<!-- NAVIGATION BAR -->
+<nav class="navbar">
+    <ul class="navbar-menu">
+        <li class="navbar-item"><a href="/">Home</a></li>
+        <li class="navbar-item"><a href="/campinfo">Camp Info</a></li>
+        <li class="navbar-item"><a href="/campschedule">Schedule</a></li>
+        <li class="navbar-item"><a href="/registrations">Registration</a></li>
+        <li class="navbar-item"><a href="/contactus">Contact</a></li>
+    </ul>
+</nav>
+
+<!-- LOGIN FORM CONTAINER -->
+<div class="container">
+    <h2>Staff Login</h2>
+    <!-- Display error message if login fails -->
+    <% if (error_message) { %> <div class="error"><%= error_message %></div> <% } %>
+    
+    <!-- LOGIN FORM - submits username and password to server -->
+    <form action="/login" method="POST">
+        <input type="text" name="username" placeholder="Username" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <button type="submit" class="btn-submit">Login</button>
+    </form>
+</div>
+</body>
+</html>
