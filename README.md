@@ -5,7 +5,7 @@
 ![AWS](https://img.shields.io/badge/AWS-Elastic_Beanstalk-orange)
 ![Database](https://img.shields.io/badge/PostgreSQL-RDS-blue)
 
-**Live Demo:** [http://sewing.is404.net](http://sewing.is404.net)
+**Live Demo:** [http://sewingmadesimple.is404.net/](http://sewingmadesimple.is404.net/)
 
 > **⚠️ Note on Protocol:** This demonstration deployment uses **HTTP** to minimize AWS infrastructure costs (specifically Load Balancer fees). The application architecture is fully compatible with SSL/TLS and will be secured via HTTPS upon final commercial deployment.
 
